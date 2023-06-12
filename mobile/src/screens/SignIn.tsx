@@ -1,19 +1,22 @@
 import { useNavigation } from "@react-navigation/native";
 import { Box, Center, Image, ScrollView, Text } from "native-base";
-import React from "react";
+import { Eye } from "phosphor-react-native";
+import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import Logo from "../assets/mktsLogo.png";
+import Button from "../components/Button";
 import Input from "../components/Input";
 import { AuthNavigationProps } from "../routes/auth.routes";
 
 export default function SignIn() {
   const navigation = useNavigation<AuthNavigationProps>();
+  const [hidePassword, setHidePassword] = useState(true);
 
   return (
     <ScrollView flexGrow={1} showsVerticalScrollIndicator={false} bg="gray.100">
-      <Box bg="gray.200" borderBottomRadius={24} px={12}>
+      <Box bg="gray.200" borderBottomRadius={24} py={16} px={12}>
         <Center>
-          <Box mt={16} mb={20}>
+          <Box mb={20}>
             <Image
               source={Logo}
               defaultSource={Logo}
@@ -25,14 +28,34 @@ export default function SignIn() {
             </Text>
           </Box>
 
-          <Text mb={4}>Acesse sua conta</Text>
+          <Text fontFamily="body" mb={4} color="gray.600">
+            Acesse sua conta
+          </Text>
           <Input placeholder="E-mail" mb={4} />
-          <Input placeholder="Senha" mb={8} />
+          <Input
+            placeholder="Senha"
+            mb={8}
+            secureTextEntry={hidePassword}
+            InputRightElement={
+              <TouchableOpacity>
+                <Eye color="#5F5B62" size={20} style={{ marginRight: 12 }} />
+              </TouchableOpacity>
+            }
+          />
+
+          <Button title="Entrar" variant="blue" />
         </Center>
       </Box>
-      <TouchableOpacity onPress={() => navigation.navigate("signUp")}>
-        <Text>Go to SignUp</Text>
-      </TouchableOpacity>
+      <Center py="56px" px={12}>
+        <Text fontFamily="body" color="gray.600" mb={4}>
+          Ainda não tem acesso?
+        </Text>
+
+        <Button
+          title="Criar uma conta"
+          onPress={() => navigation.navigate("signUp")}
+        />
+      </Center>
     </ScrollView>
   );
 }
