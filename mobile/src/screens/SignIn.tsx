@@ -1,8 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
-import { Box, Center, Image, ScrollView, Text } from "native-base";
-import { Eye } from "phosphor-react-native";
+import { Box, Center, Image, Pressable, ScrollView, Text } from "native-base";
+import { Eye, EyeSlash } from "phosphor-react-native";
 import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
 import Logo from "../assets/mktsLogo.png";
 import Button from "../components/Button";
 import Input from "../components/Input";
@@ -37,9 +36,26 @@ export default function SignIn() {
             mb={8}
             secureTextEntry={hidePassword}
             InputRightElement={
-              <TouchableOpacity>
-                <Eye color="#5F5B62" size={20} style={{ marginRight: 12 }} />
-              </TouchableOpacity>
+              <Pressable onPress={() => setHidePassword(!hidePassword)} mr={3}>
+                {({ isPressed }) => (
+                  <Box
+                    style={{
+                      opacity: isPressed ? 0.2 : 1,
+                      transform: [
+                        {
+                          scale: isPressed ? 0.85 : 1,
+                        },
+                      ],
+                    }}
+                  >
+                    {hidePassword ? (
+                      <EyeSlash color="#5F5B62" size={20} />
+                    ) : (
+                      <Eye color="#5F5B62" size={20} />
+                    )}
+                  </Box>
+                )}
+              </Pressable>
             }
           />
 
