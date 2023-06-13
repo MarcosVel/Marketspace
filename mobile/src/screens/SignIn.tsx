@@ -30,13 +30,15 @@ export default function SignIn() {
           <Text fontFamily="body" mb={4} color="gray.600">
             Acesse sua conta
           </Text>
+
           <Input placeholder="E-mail" mb={4} />
+
           <Input
             placeholder="Senha"
             mb={8}
             secureTextEntry={hidePassword}
             InputRightElement={
-              <Pressable onPress={() => setHidePassword(!hidePassword)} mr={3}>
+              <Pressable onPress={() => setHidePassword(!hidePassword)} mr={4}>
                 {({ isPressed }) => (
                   <Box
                     style={{
@@ -62,6 +64,7 @@ export default function SignIn() {
           <Button title="Entrar" variant="blue" />
         </Center>
       </Box>
+
       <Center py="56px" px={12}>
         <Text fontFamily="body" color="gray.600" mb={4}>
           Ainda não tem acesso?
