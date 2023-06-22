@@ -9,6 +9,8 @@ export default function Button({ title, variant, ...rest }: ButtonProps) {
   return (
     <NativeButton
       w="full"
+      p={3}
+      flexShrink={1}
       bg={
         variant === "dark"
           ? "gray.700"

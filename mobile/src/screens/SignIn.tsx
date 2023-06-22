@@ -77,7 +77,7 @@ export default function SignIn() {
           </Box>
 
           <Center py="56px" px={12}>
-            <Text fontFamily="body" color="gray.600" mb={4}>
+            <Text fontFamily="body" color="gray.600" mb={3}>
               Ainda não tem acesso?
             </Text>
 
