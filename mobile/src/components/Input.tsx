@@ -1,6 +1,6 @@
-import { Input as NativeBaseInput } from "native-base";
+import { IInputProps, Input as NativeBaseInput } from "native-base";
 
-export default function Input({ ...rest }) {
+export default function Input({ ...rest }: IInputProps) {
   return (
     <NativeBaseInput
       h={45}

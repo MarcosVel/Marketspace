@@ -1,7 +1,14 @@
 import { Box, Center, Flex, Stack, Text, VStack } from "native-base";
-import { ArrowRight, Plus, Tag } from "phosphor-react-native";
+import {
+  ArrowRight,
+  MagnifyingGlass,
+  Plus,
+  Sliders,
+  Tag,
+} from "phosphor-react-native";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import Button from "../components/Button";
+import Input from "../components/Input";
 import UserAvatar from "../components/UserAvatar";
 
 export default function Home() {
@@ -45,7 +52,7 @@ export default function Home() {
         />
       </Flex>
 
-      <VStack px={6}>
+      <VStack px={6} mb={8}>
         <Text fontFamily="body" color="gray.500" mb={3}>
           Seus produtos anunciados para venda
         </Text>
@@ -85,6 +92,27 @@ export default function Home() {
             </Center>
           </TouchableOpacity>
         </Box>
+      </VStack>
+
+      <VStack px={6} mb={6}>
+        <Text fontFamily="body" color="gray.500" mb={3}>
+          Compre produtos variados
+        </Text>
+
+        <Input
+          placeholder="Buscar anúncio"
+          InputRightElement={
+            <Center flexDirection="row" mr={4}>
+              <TouchableOpacity>
+                <MagnifyingGlass size={20} color="#3E3A40" weight="bold" />
+              </TouchableOpacity>
+              <Box w="1px" bg="gray.400" h="5" mx={3} />
+              <TouchableOpacity>
+                <Sliders size={20} color="#3E3A40" weight="bold" />
+              </TouchableOpacity>
+            </Center>
+          }
+        />
       </VStack>
     </SafeAreaView>
   );
