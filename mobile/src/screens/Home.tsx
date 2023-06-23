@@ -13,16 +13,14 @@ import UserAvatar from "../components/UserAvatar";
 import Item from "../components/Item";
 
 export default function Home() {
-  const list = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+  const list = Array(40).fill(0);
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
+  const ListHeader = () => (
+    <>
       <Flex
         flexDirection="row"
         alignItems="center"
         justifyContent="space-between"
-        mt={6}
-        px={6}
         mb={8}
       >
         <Flex flexDirection="row" alignItems="center">
@@ -55,7 +53,7 @@ export default function Home() {
         />
       </Flex>
 
-      <VStack px={6} mb={8}>
+      <VStack mb={8}>
         <Text fontFamily="body" color="gray.500" mb={3}>
           Seus produtos anunciados para venda
         </Text>
@@ -97,7 +95,7 @@ export default function Home() {
         </Box>
       </VStack>
 
-      <VStack px={6}>
+      <VStack>
         <Text fontFamily="body" color="gray.500" mb={3}>
           Compre produtos variados
         </Text>
@@ -117,10 +115,13 @@ export default function Home() {
           }
         />
       </VStack>
+    </>
+  );
 
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
       <FlatList
         data={list}
-        keyExtractor={(item) => item}
         renderItem={({ item }) => <Item />}
         numColumns={2}
         contentContainerStyle={{
@@ -131,6 +132,7 @@ export default function Home() {
           gap: 20,
         }}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={ListHeader}
       />
     </SafeAreaView>
   );
