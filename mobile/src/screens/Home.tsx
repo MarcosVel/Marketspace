@@ -6,17 +6,25 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
+import { useRef } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
+import { Modalize } from "react-native-modalize";
 import Button from "../components/Button";
+import Filter from "../components/Filter";
 import Input from "../components/Input";
-import UserAvatar from "../components/UserAvatar";
 import Item from "../components/Item";
+import UserAvatar from "../components/UserAvatar";
 
 export default function Home() {
+  const modalizeRef = useRef<Modalize>(null);
   const list = Array(40).fill(0);
 
+  const onOpenFilter = () => {
+    modalizeRef.current?.open();
+  };
+
   const ListHeader = () => (
-    <>
+    <Box bg="gray.200" pt={6}>
       <Flex
         flexDirection="row"
         alignItems="center"
@@ -108,24 +116,25 @@ export default function Home() {
                 <MagnifyingGlass size={20} color="#3E3A40" weight="bold" />
               </TouchableOpacity>
               <Box w="1px" bg="gray.400" h="5" mx={3} />
-              <TouchableOpacity>
+              <TouchableOpacity onPress={onOpenFilter}>
                 <Sliders size={20} color="#3E3A40" weight="bold" />
               </TouchableOpacity>
             </Center>
           }
         />
       </VStack>
-    </>
+    </Box>
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
       <FlatList
         data={list}
         renderItem={({ item }) => <Item />}
         numColumns={2}
         contentContainerStyle={{
-          padding: 24,
+          paddingHorizontal: 24,
+          paddingBottom: 36,
           gap: 24,
         }}
         columnWrapperStyle={{
@@ -133,7 +142,11 @@ export default function Home() {
         }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={ListHeader}
+        stickyHeaderIndices={[0]}
+        stickyHeaderHiddenOnScroll
       />
+
+      <Filter modalizeRef={modalizeRef} />
     </SafeAreaView>
   );
 }

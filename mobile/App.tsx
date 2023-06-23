@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import {
   Karla_400Regular,
   Karla_700Bold,
