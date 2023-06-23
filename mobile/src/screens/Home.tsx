@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Stack, Text, VStack } from "native-base";
+import { Box, Center, FlatList, Flex, Stack, Text, VStack } from "native-base";
 import {
   ArrowRight,
   MagnifyingGlass,
@@ -10,8 +10,11 @@ import { SafeAreaView, TouchableOpacity } from "react-native";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import UserAvatar from "../components/UserAvatar";
+import Item from "../components/Item";
 
 export default function Home() {
+  const list = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Flex
@@ -94,7 +97,7 @@ export default function Home() {
         </Box>
       </VStack>
 
-      <VStack px={6} mb={6}>
+      <VStack px={6}>
         <Text fontFamily="body" color="gray.500" mb={3}>
           Compre produtos variados
         </Text>
@@ -114,6 +117,21 @@ export default function Home() {
           }
         />
       </VStack>
+
+      <FlatList
+        data={list}
+        keyExtractor={(item) => item}
+        renderItem={({ item }) => <Item />}
+        numColumns={2}
+        contentContainerStyle={{
+          padding: 24,
+          gap: 24,
+        }}
+        columnWrapperStyle={{
+          gap: 20,
+        }}
+        showsVerticalScrollIndicator={false}
+      />
     </SafeAreaView>
   );
 }
