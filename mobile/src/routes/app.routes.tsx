@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { House, SignOut, Tag } from "phosphor-react-native";
+import { House, Plus, SignOut, Tag } from "phosphor-react-native";
 import Home from "../screens/Home";
 import MyAds from "../screens/MyAds";
 
@@ -17,6 +17,16 @@ export function AppRoutes() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#1A181B",
         tabBarInactiveTintColor: "#9F9BA1",
+        headerTitleStyle: {
+          fontFamily: "Karla_700Bold",
+          fontSize: 20,
+          color: "#1A181B",
+        },
+        headerStyle: {
+          backgroundColor: "#EDECEE",
+          elevation: 0,
+          shadowOpacity: 0,
+        },
       }}
     >
       <Screen
@@ -41,6 +51,12 @@ export function AppRoutes() {
             ) : (
               <Tag color={color} size={size} />
             ),
+          headerTitle: "Meus anúncios",
+          headerShown: true,
+          // headerRight: () => <Plus size={24} color="#1A181B" />, -> inside useLayoutEffect
+          headerRightContainerStyle: {
+            right: 24,
+          },
         }}
       />
       <Screen
