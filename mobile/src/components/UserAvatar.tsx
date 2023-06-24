@@ -1,6 +1,6 @@
-import { Image } from "native-base";
+import { Avatar, IAvatarProps } from "native-base";
 
-type UserAvatarProps = {
+type UserAvatarProps = IAvatarProps & {
   width: number;
   height: number;
   borderWidth: number;
@@ -12,20 +12,19 @@ export default function UserAvatar({
   height,
   borderWidth,
   avatarUrl,
+  ...rest
 }: UserAvatarProps) {
   return (
-    <Image
+    <Avatar
       w={width}
       h={height}
       rounded="full"
       borderWidth={borderWidth}
       borderColor="blue.400"
-      alt="User avatar"
       source={
         avatarUrl ? { uri: avatarUrl } : require("../assets/emptyAvatar.png")
       }
-      defaultSource={require("../assets/emptyAvatar.png")}
-      resizeMode="contain"
+      {...rest}
     />
   );
 }

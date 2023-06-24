@@ -62,7 +62,7 @@ export default function SignUp() {
           </Center>
         </Box>
 
-        <Box mb={12}>
+        <Box mb={10}>
           <Center>
             <Pressable mb={4}>
               <UserAvatar width={88} height={88} borderWidth={3} />
@@ -153,7 +153,7 @@ export default function SignUp() {
         </Box>
 
         <Center mb={16}>
-          <Text fontFamily="body" fontSize="sm" color="gray.600" mb={4}>
+          <Text fontFamily="body" fontSize="sm" color="gray.600" mb={3}>
             Já tem uma conta?
           </Text>
 

@@ -9,6 +9,8 @@ export default function Button({ title, variant, ...rest }: ButtonProps) {
   return (
     <NativeButton
       w="full"
+      p={3}
+      flexShrink={1}
       bg={
         variant === "dark"
           ? "gray.700"
@@ -20,7 +22,7 @@ export default function Button({ title, variant, ...rest }: ButtonProps) {
       _pressed={{
         bg:
           variant === "dark"
-            ? "gray.600"
+            ? "gray.500"
             : variant === "blue"
             ? "blue.800"
             : "gray.400",
