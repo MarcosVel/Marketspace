@@ -1,12 +1,15 @@
-import { Badge, Box, Flex, Image, Text } from "native-base";
+import { Box, Flex, Image, Text } from "native-base";
+import { Dimensions, TouchableOpacity } from "react-native";
 import UserAvatar from "./UserAvatar";
-import { TouchableOpacity } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 export default function Item() {
   return (
     <TouchableOpacity
       style={{
         flexGrow: 1,
+        maxWidth: width / 2 - 34,
       }}
       activeOpacity={0.6}
     >
