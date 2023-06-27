@@ -1,10 +1,14 @@
+import { useNavigation } from "@react-navigation/native";
 import { Box, Flex, Image, Text } from "native-base";
 import { Dimensions, TouchableOpacity } from "react-native";
+import { AppNavigationProps } from "../routes/app.routes";
 import UserAvatar from "./UserAvatar";
 
 const { width } = Dimensions.get("window");
 
 export default function Item() {
+  const navigation = useNavigation<AppNavigationProps>();
+
   return (
     <TouchableOpacity
       style={{
@@ -12,6 +16,7 @@ export default function Item() {
         maxWidth: width / 2 - 34,
       }}
       activeOpacity={0.6}
+      onPress={() => navigation.navigate("details")}
     >
       <Box>
         <Image

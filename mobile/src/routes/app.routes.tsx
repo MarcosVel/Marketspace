@@ -1,12 +1,41 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { House, Plus, SignOut, Tag } from "phosphor-react-native";
+import {
+  NativeStackNavigationProp,
+  createNativeStackNavigator,
+} from "@react-navigation/native-stack";
+import { House, SignOut, Tag } from "phosphor-react-native";
+import Details from "../screens/Details";
 import Home from "../screens/Home";
 import MyAds from "../screens/MyAds";
 
+type AppRoutes = {
+  details: undefined;
+};
+
+export type AppNavigationProps = NativeStackNavigationProp<AppRoutes>;
+
 const { Navigator, Screen } = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 function SignOutButton() {
   return null;
+}
+
+function StackRoutes() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        headerStyle: {
+          backgroundColor: "#EDECEE",
+        },
+        headerShadowVisible: false, // border bottom
+      }}
+    >
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="details" component={Details} />
+    </Stack.Navigator>
+  );
 }
 
 export function AppRoutes() {
@@ -30,8 +59,8 @@ export function AppRoutes() {
       }}
     >
       <Screen
-        name="Home"
-        component={Home}
+        name="StackRoutes"
+        component={StackRoutes}
         options={{
           tabBarIcon: ({ color, size, focused }) =>
             focused ? (
