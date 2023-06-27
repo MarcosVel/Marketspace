@@ -18,7 +18,7 @@ import {
   QrCode,
 } from "phosphor-react-native";
 import { useLayoutEffect } from "react";
-import { Dimensions, SafeAreaView } from "react-native";
+import { Dimensions, SafeAreaView, TouchableOpacity } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import UserAvatar from "../components/UserAvatar";
 import { AppNavigationProps } from "../routes/app.routes";
@@ -36,7 +36,11 @@ export default function Details() {
     navigation.setOptions({
       headerShown: true,
       headerTitle: "",
-      headerLeft: () => <ArrowLeft size={24} color="#1A181B" />,
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <ArrowLeft size={24} color="#1A181B" />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 

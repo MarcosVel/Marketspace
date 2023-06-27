@@ -21,24 +21,7 @@ function SignOutButton() {
   return null;
 }
 
-function StackRoutes() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-        headerStyle: {
-          backgroundColor: "#EDECEE",
-        },
-        headerShadowVisible: false, // border bottom
-      }}
-    >
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="details" component={Details} />
-    </Stack.Navigator>
-  );
-}
-
-export function AppRoutes() {
+function TabRoutes() {
   return (
     <Navigator
       screenOptions={{
@@ -59,8 +42,8 @@ export function AppRoutes() {
       }}
     >
       <Screen
-        name="StackRoutes"
-        component={StackRoutes}
+        name="home"
+        component={Home}
         options={{
           tabBarIcon: ({ color, size, focused }) =>
             focused ? (
@@ -102,5 +85,22 @@ export function AppRoutes() {
         }}
       />
     </Navigator>
+  );
+}
+
+export function AppRoutes() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        headerStyle: {
+          backgroundColor: "#EDECEE",
+        },
+        headerShadowVisible: false, // border bottom
+      }}
+    >
+      <Stack.Screen name="TabRoutes" component={TabRoutes} />
+      <Stack.Screen name="details" component={Details} />
+    </Stack.Navigator>
   );
 }
