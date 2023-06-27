@@ -4,10 +4,9 @@ import { CaretDown, Plus } from "phosphor-react-native";
 import { useLayoutEffect, useState } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import Item from "../components/Item";
-import { AuthNavigationProps } from "../routes/auth.routes";
 
 export default function MyAds() {
-  const navigation = useNavigation<AuthNavigationProps>();
+  const navigation = useNavigation();
   const [filter, setFilter] = useState<"all" | "actives" | "inactives">("all");
   const list = Array(5).fill(0);
 
