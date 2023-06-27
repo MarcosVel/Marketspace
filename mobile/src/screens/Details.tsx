@@ -16,10 +16,12 @@ import {
   CreditCard,
   Money,
   QrCode,
+  WhatsappLogo,
 } from "phosphor-react-native";
 import { useLayoutEffect } from "react";
 import { Dimensions, SafeAreaView, TouchableOpacity } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
+import Button from "../components/Button";
 import UserAvatar from "../components/UserAvatar";
 import { AppNavigationProps } from "../routes/app.routes";
 
@@ -46,7 +48,12 @@ export default function Details() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 64,
+        }}
+      >
         <Carousel
           width={width}
           height={280}
@@ -166,6 +173,41 @@ export default function Details() {
           </Flex>
         </Box>
       </ScrollView>
+
+      <Box
+        pt={5}
+        px={6}
+        pb={8}
+        bg="gray.100"
+        w="full"
+        justifyContent="space-between"
+        alignItems="center"
+        position="absolute"
+        bottom={0}
+        flexDirection="row"
+      >
+        <Flex flexDirection="row" alignItems="baseline">
+          <Text fontFamily="heading" color="blue.400">
+            R$
+          </Text>
+          <Text
+            fontFamily="heading"
+            fontSize="xl"
+            color="blue.400"
+            lineHeight="md"
+            ml={0.5}
+          >
+            54,90
+          </Text>
+        </Flex>
+
+        <Button
+          title="Entrar em contato"
+          w={null}
+          variant="blue"
+          leftIcon={<WhatsappLogo size={16} color="#EDECEE" weight="fill" />}
+        />
+      </Box>
     </SafeAreaView>
   );
 }
