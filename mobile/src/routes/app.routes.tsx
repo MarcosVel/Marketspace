@@ -4,12 +4,14 @@ import {
   createNativeStackNavigator,
 } from "@react-navigation/native-stack";
 import { House, SignOut, Tag } from "phosphor-react-native";
+import CreateAd from "../screens/CreateAd";
 import Details from "../screens/Details";
 import Home from "../screens/Home";
 import MyAds from "../screens/MyAds";
 
 type AppRoutes = {
   details: undefined;
+  createAd: undefined;
 };
 
 export type AppNavigationProps = NativeStackNavigationProp<AppRoutes>;
@@ -96,11 +98,17 @@ export function AppRoutes() {
         headerStyle: {
           backgroundColor: "#EDECEE",
         },
+        headerTitleStyle: {
+          fontFamily: "Karla_700Bold",
+          fontSize: 20,
+          color: "#1A181B",
+        },
         headerShadowVisible: false, // border bottom
       }}
     >
       <Stack.Screen name="TabRoutes" component={TabRoutes} />
       <Stack.Screen name="details" component={Details} />
+      <Stack.Screen name="createAd" component={CreateAd} />
     </Stack.Navigator>
   );
 }
