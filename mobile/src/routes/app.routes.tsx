@@ -41,6 +41,7 @@ function TabRoutes() {
           elevation: 0,
           shadowOpacity: 0,
         },
+        headerTitleAlign: "center",
       }}
     >
       <Screen
@@ -104,6 +105,7 @@ export function AppRoutes() {
           color: "#1A181B",
         },
         headerShadowVisible: false, // border bottom
+        headerTitleAlign: "center",
       }}
     >
       <Stack.Screen name="TabRoutes" component={TabRoutes} />

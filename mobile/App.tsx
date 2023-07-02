@@ -1,4 +1,4 @@
-import 'react-native-gesture-handler';
+import "react-native-gesture-handler";
 import {
   Karla_400Regular,
   Karla_700Bold,
@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={THEME}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#EDECEE" />
       {fontsLoaded ? <Routes /> : <Loading />}
     </NativeBaseProvider>
   );
