@@ -14,8 +14,11 @@ import Filter from "../components/Filter";
 import Input from "../components/Input";
 import Item from "../components/Item";
 import UserAvatar from "../components/UserAvatar";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigationProps } from "../routes/app.routes";
 
 export default function Home() {
+  const navigation = useNavigation<AppNavigationProps>();
   const modalizeRef = useRef<Modalize>(null);
   const list = Array(40).fill(0);
 
@@ -58,6 +61,7 @@ export default function Home() {
           w={null}
           variant="dark"
           leftIcon={<Plus color="#F7F7F8" size={18} />}
+          onPress={() => navigation.navigate("createAd")}
         />
       </Flex>
 
