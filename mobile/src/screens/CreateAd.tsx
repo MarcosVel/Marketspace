@@ -3,8 +3,10 @@ import {
   Box,
   FlatList,
   Flex,
+  HStack,
   Image,
   KeyboardAvoidingView,
+  Radio,
   ScrollView,
   Text,
   TextArea,
@@ -125,6 +127,40 @@ export default function CreateAd() {
               bg: "gray.100",
             }}
           />
+
+          <Radio.Group name="productName">
+            <HStack alignItems="center" space={6}>
+              <Radio
+                value="1"
+                bg="gray.200"
+                _checked={{
+                  borderColor: "blue.400",
+                }}
+                _icon={{
+                  color: "blue.400",
+                }}
+              >
+                <Text fontFamily="body" fontSize="md" color="gray.600">
+                  Produto novo
+                </Text>
+              </Radio>
+
+              <Radio
+                value="2"
+                bg="gray.200"
+                _checked={{
+                  borderColor: "blue.400",
+                }}
+                _icon={{
+                  color: "blue.400",
+                }}
+              >
+                <Text fontFamily="body" fontSize="md" color="gray.600">
+                  Produto usado
+                </Text>
+              </Radio>
+            </HStack>
+          </Radio.Group>
         </VStack>
       </ScrollView>
     </SafeAreaView>
