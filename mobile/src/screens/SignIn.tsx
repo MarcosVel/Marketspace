@@ -1,15 +1,19 @@
 import { useNavigation } from "@react-navigation/native";
 import { Box, Center, Image, Pressable, ScrollView, Text } from "native-base";
 import { Eye, EyeSlash } from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Logo from "../assets/mktsLogo.png";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import { AuthNavigationProps } from "../routes/auth.routes";
 import { SafeAreaView } from "react-native";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function SignIn() {
   const navigation = useNavigation<AuthNavigationProps>();
+  const { signIn, user } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [hidePassword, setHidePassword] = useState(true);
 
   return (
@@ -39,7 +43,12 @@ export default function SignIn() {
                 Acesse sua conta
               </Text>
 
-              <Input placeholder="E-mail" mb={4} />
+              <Input
+                placeholder="E-mail"
+                mb={4}
+                defaultValue={email}
+                onChangeText={(text) => setEmail(text)}
+              />
 
               <Input
                 placeholder="Senha"
@@ -70,9 +79,15 @@ export default function SignIn() {
                     )}
                   </Pressable>
                 }
+                defaultValue={password}
+                onChangeText={(text) => setPassword(text)}
               />
 
-              <Button title="Entrar" variant="blue" />
+              <Button
+                title="Entrar"
+                variant="blue"
+                onPress={() => signIn(email, password)}
+              />
             </Center>
           </Box>
 
