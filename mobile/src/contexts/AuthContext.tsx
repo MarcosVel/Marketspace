@@ -1,10 +1,11 @@
 import { createContext, useState } from "react";
-import { UserDTO } from "../types/UserDto";
 import api from "../services/api";
+import { UserDTO } from "../types/UserDto";
 
 type AuthContextDataProps = {
   user: UserDTO;
   signIn: (email: string, password: string) => Promise<void>;
+  isLoadingUser: boolean;
 };
 
 type AuthContextProviderProps = {
@@ -17,18 +18,26 @@ export const AuthContext = createContext<AuthContextDataProps>(
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<UserDTO>({} as UserDTO);
+  const [isLoadingUser, setIsLoadingUser] = useState<boolean>(false);
 
   async function signIn(email: string, password: string) {
     try {
-      const response = await api.post("/sessions", { email, password });
-      console.log("Response on signIn", response.data);
+      setIsLoadingUser(true);
+      const { data } = await api.post("/sessions", { email, password });
+
+      if (data.user && data.token) {
+        setUser(data.user);
+        console.log("User", data.user);
+      }
     } catch (error) {
       console.log("Error on signIn", error);
+    } finally {
+      setIsLoadingUser(false);
     }
   }
 
   return (
-    <AuthContext.Provider value={{ user, signIn }}>
+    <AuthContext.Provider value={{ user, signIn, isLoadingUser }}>
       {children}
     </AuthContext.Provider>
   );
