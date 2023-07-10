@@ -1,4 +1,3 @@
-import "react-native-gesture-handler";
 import {
   Karla_400Regular,
   Karla_700Bold,
@@ -6,7 +5,9 @@ import {
 } from "@expo-google-fonts/karla";
 import { NativeBaseProvider } from "native-base";
 import { StatusBar } from "react-native";
+import "react-native-gesture-handler";
 import Loading from "./src/components/Loading";
+import { AuthContextProvider } from "./src/contexts/AuthContext";
 import Routes from "./src/routes";
 import { THEME } from "./src/theme";
 
@@ -16,7 +17,9 @@ export default function App() {
   return (
     <NativeBaseProvider theme={THEME}>
       <StatusBar barStyle="dark-content" backgroundColor="#EDECEE" />
-      {fontsLoaded ? <Routes /> : <Loading />}
+      <AuthContextProvider>
+        {fontsLoaded ? <Routes /> : <Loading />}
+      </AuthContextProvider>
     </NativeBaseProvider>
   );
 }
