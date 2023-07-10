@@ -27,7 +27,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
       if (data.user && data.token) {
         setUser(data.user);
-        console.log("User", data.user);
       }
     } catch (error) {
       console.log("Error on signIn", error);

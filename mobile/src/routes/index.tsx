@@ -8,8 +8,6 @@ import { AuthRoutes } from "./auth.routes";
 export default function Routes() {
   const { user, isLoadingUser } = React.useContext(AuthContext);
 
-  console.log("User", user);
-
   if (isLoadingUser) {
     return <Loading />;
   }

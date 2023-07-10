@@ -16,13 +16,34 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import { AuthContext } from "../contexts/AuthContext";
 import { AuthNavigationProps } from "../routes/auth.routes";
+import { Controller, useForm } from "react-hook-form";
+
+type FormDataProps = {
+  email: string;
+  password: string;
+};
 
 export default function SignIn() {
   const navigation = useNavigation<AuthNavigationProps>();
   const { signIn } = useContext(AuthContext);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>();
   const [hidePassword, setHidePassword] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSignIn({ email, password }: FormDataProps) {
+    try {
+      setLoading(true);
+      signIn(email, password);
+    } catch (error) {
+      console.log("Error on handleSignIn", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <>
@@ -53,50 +74,75 @@ export default function SignIn() {
                   Acesse sua conta
                 </Text>
 
-                <Input
-                  placeholder="E-mail"
-                  mb={4}
-                  defaultValue={email}
-                  onChangeText={(text) => setEmail(text)}
+                <Controller
+                  control={control}
+                  name="email"
+                  rules={{
+                    required: "Informe o e-mail",
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Informe um e-mail válido",
+                    },
+                  }}
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      mb={4}
+                      placeholder="E-mail"
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      value={value}
+                      onChangeText={onChange}
+                      errorMessages={errors.email?.message}
+                    />
+                  )}
                 />
 
-                <Input
-                  placeholder="Senha"
-                  mb={8}
-                  secureTextEntry={hidePassword}
-                  InputRightElement={
-                    <Pressable
-                      onPress={() => setHidePassword(!hidePassword)}
-                      mr={4}
-                    >
-                      {({ isPressed }) => (
-                        <Box
-                          style={{
-                            opacity: isPressed ? 0.2 : 1,
-                            transform: [
-                              {
-                                scale: isPressed ? 0.85 : 1,
-                              },
-                            ],
-                          }}
+                <Controller
+                  control={control}
+                  name="password"
+                  rules={{ required: "Informe a senha" }}
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      mb={8}
+                      placeholder="Senha"
+                      secureTextEntry={hidePassword}
+                      InputRightElement={
+                        <Pressable
+                          onPress={() => setHidePassword(!hidePassword)}
+                          mr={4}
                         >
-                          {hidePassword ? (
-                            <EyeSlash color="#5F5B62" size={20} />
-                          ) : (
-                            <Eye color="#5F5B62" size={20} />
+                          {({ isPressed }) => (
+                            <Box
+                              style={{
+                                opacity: isPressed ? 0.2 : 1,
+                                transform: [
+                                  {
+                                    scale: isPressed ? 0.85 : 1,
+                                  },
+                                ],
+                              }}
+                            >
+                              {hidePassword ? (
+                                <EyeSlash color="#5F5B62" size={20} />
+                              ) : (
+                                <Eye color="#5F5B62" size={20} />
+                              )}
+                            </Box>
                           )}
-                        </Box>
-                      )}
-                    </Pressable>
-                  }
-                  defaultValue={password}
-                  onChangeText={(text) => setPassword(text)}
+                        </Pressable>
+                      }
+                      value={value}
+                      onChangeText={onChange}
+                      errorMessages={errors.password?.message}
+                    />
+                  )}
                 />
 
                 <Button
                   title="Entrar"
                   variant="blue"
-                  onPress={() => signIn(email, password)}
+                  onPress={handleSubmit(handleSignIn)}
+                  isLoading={loading}
                 />
               </Center>
             </Box>
