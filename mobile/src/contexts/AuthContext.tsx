@@ -5,6 +5,7 @@ import { UserDTO } from "../types/UserDto";
 type AuthContextDataProps = {
   user: UserDTO;
   signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
   isLoadingUser: boolean;
 };
 
@@ -22,10 +23,10 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   async function signIn(email: string, password: string) {
     try {
-      setIsLoadingUser(true);
       const { data } = await api.post("/sessions", { email, password });
 
       if (data.user && data.token) {
+        setIsLoadingUser(true);
         setUser(data.user);
       }
     } catch (error) {
@@ -35,8 +36,19 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
+  async function signOut() {
+    try {
+      setIsLoadingUser(true);
+      setUser({} as UserDTO);
+    } catch (error) {
+      console.log("Error on signOut", error);
+    } finally {
+      setIsLoadingUser(false);
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, signIn, isLoadingUser }}>
+    <AuthContext.Provider value={{ user, signIn, isLoadingUser, signOut }}>
       {children}
     </AuthContext.Provider>
   );
