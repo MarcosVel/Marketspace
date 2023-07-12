@@ -23,10 +23,10 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   async function signIn(email: string, password: string) {
     try {
-      setIsLoadingUser(true);
       const { data } = await api.post("/sessions", { email, password });
 
       if (data.user && data.token) {
+        setIsLoadingUser(true);
         setUser(data.user);
       }
     } catch (error) {
