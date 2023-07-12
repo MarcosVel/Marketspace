@@ -4,6 +4,8 @@ import {
   createNativeStackNavigator,
 } from "@react-navigation/native-stack";
 import { House, SignOut, Tag } from "phosphor-react-native";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 import CreateAd from "../screens/CreateAd";
 import Details from "../screens/Details";
 import Home from "../screens/Home";
@@ -24,6 +26,8 @@ function SignOutButton() {
 }
 
 function TabRoutes() {
+  const { signOut } = useContext(AuthContext);
+
   return (
     <Navigator
       screenOptions={{
@@ -80,7 +84,7 @@ function TabRoutes() {
         listeners={() => ({
           tabPress: (e) => {
             e.preventDefault();
-            console.log("SignOut");
+            signOut();
           },
         })}
         options={{
