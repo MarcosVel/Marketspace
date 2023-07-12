@@ -1,3 +1,4 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
 import {
   Box,
@@ -10,16 +11,64 @@ import {
 } from "native-base";
 import { Eye, EyeSlash, PencilSimpleLine } from "phosphor-react-native";
 import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView } from "react-native";
+import * as yup from "yup";
 import logo from "../assets/smallLogo.png";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import UserAvatar from "../components/UserAvatar";
 import { AuthNavigationProps } from "../routes/auth.routes";
 
+type FormDataProps = {
+  name: string;
+  email: string;
+  tel: string;
+  password: string;
+  confirm_password: string;
+};
+
+const signUpSchema = yup.object({
+  name: yup.string().required("Nome obrigatório"),
+  email: yup
+    .string()
+    .required("E-mail obrigatório")
+    .email("Informe um e-mail válido"),
+  tel: yup
+    .string()
+    .required("Telefone obrigatório")
+    .length(11, "Ex.: (99) 98765-4321"),
+  password: yup
+    .string()
+    .required("Senha obrigatória")
+    .min(6, "Mínimo 6 dígitos"),
+  confirm_password: yup
+    .string()
+    .required("Confirme a senha")
+    .oneOf([yup.ref("password"), null], "As senhas devem ser iguais"),
+});
+
 export default function SignUp() {
   const navigation = useNavigation<AuthNavigationProps>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    defaultValues: {
+      name: "",
+      email: "",
+      tel: "",
+      password: "",
+      confirm_password: "",
+    },
+    resolver: yupResolver(signUpSchema),
+  });
   const [hidePassword, setHidePassword] = useState(true);
+
+  function handleSignUp(data: FormDataProps) {
+    console.log(data);
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
@@ -28,6 +77,7 @@ export default function SignUp() {
         flexGrow={1}
         px={12}
         showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets
       >
         <Box mt={5} mb={8}>
           <Center>
@@ -82,73 +132,137 @@ export default function SignUp() {
               </NativeBase>
             </Pressable>
 
-            <Input placeholder="Nome" mb={4} />
-
-            <Input placeholder="E-mail" mb={4} />
-
-            <Input placeholder="Telefone" mb={4} />
-
-            <Input
-              placeholder="Senha"
-              mb={4}
-              InputRightElement={
-                <Pressable
-                  onPress={() => setHidePassword(!hidePassword)}
-                  mr={4}
-                >
-                  {({ isPressed }) => (
-                    <Box
-                      style={{
-                        opacity: isPressed ? 0.2 : 1,
-                        transform: [
-                          {
-                            scale: isPressed ? 0.85 : 1,
-                          },
-                        ],
-                      }}
-                    >
-                      {hidePassword ? (
-                        <EyeSlash color="#5F5B62" size={20} />
-                      ) : (
-                        <Eye color="#5F5B62" size={20} />
-                      )}
-                    </Box>
-                  )}
-                </Pressable>
-              }
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  mb={4}
+                  placeholder="Nome"
+                  value={value}
+                  onChangeText={onChange}
+                  errorMessage={errors.name?.message}
+                />
+              )}
             />
 
-            <Input
-              placeholder="Confirmar senha"
-              mb={6}
-              InputRightElement={
-                <Pressable
-                  onPress={() => setHidePassword(!hidePassword)}
-                  mr={4}
-                >
-                  {({ isPressed }) => (
-                    <Box
-                      style={{
-                        opacity: isPressed ? 0.2 : 1,
-                        transform: [
-                          {
-                            scale: isPressed ? 0.85 : 1,
-                          },
-                        ],
-                      }}
-                    >
-                      {hidePassword ? (
-                        <EyeSlash color="#5F5B62" size={20} />
-                      ) : (
-                        <Eye color="#5F5B62" size={20} />
-                      )}
-                    </Box>
-                  )}
-                </Pressable>
-              }
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  mb={4}
+                  placeholder="E-mail"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  value={value}
+                  onChangeText={onChange}
+                  errorMessage={errors.email?.message}
+                />
+              )}
             />
 
-            <Button title="Criar" variant="dark" />
+            <Controller
+              control={control}
+              name="tel"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  mb={4}
+                  placeholder="Telefone"
+                  keyboardType="phone-pad"
+                  maxLength={11}
+                  value={value}
+                  onChangeText={onChange}
+                  errorMessage={errors.tel?.message}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  mb={4}
+                  placeholder="Senha"
+                  secureTextEntry={hidePassword}
+                  InputRightElement={
+                    <Pressable
+                      onPress={() => setHidePassword(!hidePassword)}
+                      mr={4}
+                    >
+                      {({ isPressed }) => (
+                        <Box
+                          style={{
+                            opacity: isPressed ? 0.2 : 1,
+                            transform: [
+                              {
+                                scale: isPressed ? 0.85 : 1,
+                              },
+                            ],
+                          }}
+                        >
+                          {hidePassword ? (
+                            <EyeSlash color="#5F5B62" size={20} />
+                          ) : (
+                            <Eye color="#5F5B62" size={20} />
+                          )}
+                        </Box>
+                      )}
+                    </Pressable>
+                  }
+                  value={value}
+                  onChangeText={onChange}
+                  errorMessage={errors.password?.message}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="confirm_password"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  mb={6}
+                  placeholder="Confirmar senha"
+                  secureTextEntry={hidePassword}
+                  InputRightElement={
+                    <Pressable
+                      onPress={() => setHidePassword(!hidePassword)}
+                      mr={4}
+                    >
+                      {({ isPressed }) => (
+                        <Box
+                          style={{
+                            opacity: isPressed ? 0.2 : 1,
+                            transform: [
+                              {
+                                scale: isPressed ? 0.85 : 1,
+                              },
+                            ],
+                          }}
+                        >
+                          {hidePassword ? (
+                            <EyeSlash color="#5F5B62" size={20} />
+                          ) : (
+                            <Eye color="#5F5B62" size={20} />
+                          )}
+                        </Box>
+                      )}
+                    </Pressable>
+                  }
+                  value={value}
+                  onChangeText={onChange}
+                  errorMessage={errors.confirm_password?.message}
+                />
+              )}
+            />
+
+            <Button
+              title="Criar"
+              variant="dark"
+              onPress={handleSubmit(handleSignUp)}
+            />
           </Center>
         </Box>
 
