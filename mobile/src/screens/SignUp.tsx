@@ -1,5 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 import {
   Box,
   Center,
@@ -7,7 +8,9 @@ import {
   Button as NativeBase,
   Pressable,
   ScrollView,
+  Skeleton,
   Text,
+  useToast,
 } from "native-base";
 import { Eye, EyeSlash, PencilSimpleLine } from "phosphor-react-native";
 import React, { useState } from "react";
@@ -19,6 +22,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import UserAvatar from "../components/UserAvatar";
 import { AuthNavigationProps } from "../routes/auth.routes";
+import api from "../services/api";
 
 type FormDataProps = {
   name: string;
@@ -49,6 +53,7 @@ const signUpSchema = yup.object({
 });
 
 export default function SignUp() {
+  const toast = useToast();
   const navigation = useNavigation<AuthNavigationProps>();
   const {
     control,
@@ -65,9 +70,68 @@ export default function SignUp() {
     resolver: yupResolver(signUpSchema),
   });
   const [hidePassword, setHidePassword] = useState(true);
+  const [avatarIsLoading, setAvatarIsLoading] = useState(false);
+  const [userPhotoFile, setUserPhotoFile] = useState("");
 
-  function handleSignUp(data: FormDataProps) {
-    console.log(data);
+  async function handleAvatarSelection() {
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (photoSelected.canceled) {
+        setAvatarIsLoading(false);
+        return;
+      }
+
+      if (photoSelected.assets[0].uri) {
+        setAvatarIsLoading(true);
+
+        const fileExtension = photoSelected.assets[0].uri.split(".").pop();
+
+        const photoFile = {
+          uri: photoSelected.assets[0].uri,
+          name: `${Date.now()}.${fileExtension}`,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+        } as any;
+
+        setUserPhotoFile(photoFile);
+      }
+    } catch (error) {
+      console.log("Error on handleAvatarSelection:", error);
+    } finally {
+      setAvatarIsLoading(false);
+    }
+  }
+
+  async function handleSignUp({ name, email, tel, password }: FormDataProps) {
+    const formData = new FormData();
+    formData.append("avatar", userPhotoFile);
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("tel", tel);
+    formData.append("password", password);
+
+    await api
+      .post("/users", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        toast.show({
+          title: "Conta criada com sucesso!",
+        });
+        navigation.navigate("signIn");
+      })
+      .catch((error) => {
+        console.log("error on handleSignUp:", error);
+        console.log("error response:", error.response.data);
+      });
   }
 
   return (
@@ -114,8 +178,25 @@ export default function SignUp() {
 
         <Box mb={10}>
           <Center>
-            <Pressable mb={4}>
-              <UserAvatar width={88} height={88} borderWidth={3} />
+            <Pressable mb={4} onPress={handleAvatarSelection}>
+              {avatarIsLoading ? (
+                <Skeleton
+                  w={88}
+                  h={88}
+                  rounded="full"
+                  startColor="gray.300"
+                  endColor="gray.400"
+                  borderWidth={3}
+                  borderColor="blue.400"
+                />
+              ) : (
+                <UserAvatar
+                  width={88}
+                  height={88}
+                  borderWidth={3}
+                  avatarUrl={userPhotoFile.uri}
+                />
+              )}
               <NativeBase
                 w={10}
                 h={10}
@@ -127,6 +208,7 @@ export default function SignUp() {
                 position="absolute"
                 bottom={0}
                 right={-8}
+                onPress={handleAvatarSelection}
               >
                 <PencilSimpleLine size={16} color="#F7F7F8" />
               </NativeBase>
