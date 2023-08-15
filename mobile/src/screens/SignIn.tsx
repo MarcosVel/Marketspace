@@ -37,7 +37,7 @@ export default function SignIn() {
   async function handleSignIn({ email, password }: FormDataProps) {
     try {
       setLoading(true);
-      signIn(email, password);
+      await signIn(email, password);
     } catch (error) {
       console.log("Error on handleSignIn", error);
     } finally {
@@ -92,7 +92,7 @@ export default function SignIn() {
                       keyboardType="email-address"
                       value={value}
                       onChangeText={onChange}
-                      errorMessages={errors.email?.message}
+                      errorMessage={errors.email?.message}
                     />
                   )}
                 />
@@ -133,7 +133,7 @@ export default function SignIn() {
                       }
                       value={value}
                       onChangeText={onChange}
-                      errorMessages={errors.password?.message}
+                      errorMessage={errors.password?.message}
                     />
                   )}
                 />

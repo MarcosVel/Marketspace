@@ -5,12 +5,12 @@ import {
 } from "native-base";
 
 type Props = IInputProps & {
-  errorMessages?: string | null;
+  errorMessage?: string | null;
 };
 
-export default function Input({ errorMessages, mb, ...rest }: Props) {
+export default function Input({ errorMessage, mb, ...rest }: Props) {
   return (
-    <FormControl isInvalid={!!errorMessages} mb={mb}>
+    <FormControl isInvalid={!!errorMessage} mb={mb}>
       <NativeBaseInput
         h={45}
         px={4}
@@ -29,7 +29,7 @@ export default function Input({ errorMessages, mb, ...rest }: Props) {
       />
 
       <FormControl.ErrorMessage _text={{ color: "red.400" }}>
-        {errorMessages}
+        {errorMessage}
       </FormControl.ErrorMessage>
     </FormControl>
   );
