@@ -108,6 +108,8 @@ export default function SignUp() {
   }
 
   async function handleSignUp({ name, email, tel, password }: FormDataProps) {
+    if (!userPhotoFile) return toast.show({ title: "Imagem obrigatória" });
+
     const formData = new FormData();
     formData.append("avatar", userPhotoFile);
     formData.append("name", name);
@@ -123,9 +125,11 @@ export default function SignUp() {
       })
       .then((response) => {
         console.log(response.data);
+
         toast.show({
           title: "Conta criada com sucesso!",
         });
+
         navigation.navigate("signIn");
       })
       .catch((error) => {

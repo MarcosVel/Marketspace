@@ -37,7 +37,7 @@ export default function SignIn() {
   async function handleSignIn({ email, password }: FormDataProps) {
     try {
       setLoading(true);
-      signIn(email, password);
+      await signIn(email, password);
     } catch (error) {
       console.log("Error on handleSignIn", error);
     } finally {
