@@ -14,6 +14,7 @@ import MyAds from "../screens/MyAds";
 type AppRoutes = {
   details: undefined;
   createAd: undefined;
+  myAds: undefined;
 };
 
 export type AppNavigationProps = NativeStackNavigationProp<AppRoutes>;
@@ -61,7 +62,7 @@ function TabRoutes() {
         }}
       />
       <Screen
-        name="MyAds"
+        name="myAds"
         component={MyAds}
         options={{
           tabBarIcon: ({ color, size, focused }) =>

@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { Box, Center, FlatList, Flex, Stack, Text, VStack } from "native-base";
 import {
   ArrowRight,
@@ -6,7 +7,7 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Button from "../components/Button";
@@ -14,10 +15,11 @@ import Filter from "../components/Filter";
 import Input from "../components/Input";
 import Item from "../components/Item";
 import UserAvatar from "../components/UserAvatar";
-import { useNavigation } from "@react-navigation/native";
+import { AuthContext } from "../contexts/AuthContext";
 import { AppNavigationProps } from "../routes/app.routes";
 
 export default function Home() {
+  const { user } = useContext(AuthContext);
   const navigation = useNavigation<AppNavigationProps>();
   const modalizeRef = useRef<Modalize>(null);
   const list = Array(40).fill(0);
@@ -35,7 +37,12 @@ export default function Home() {
         mb={8}
       >
         <Flex flexDirection="row" alignItems="center">
-          <UserAvatar width={45} height={45} borderWidth={2} />
+          <UserAvatar
+            width={45}
+            height={45}
+            borderWidth={2}
+            avatarUrl={user.avatar}
+          />
           <Flex ml={2}>
             <Text
               fontFamily="body"
@@ -51,7 +58,7 @@ export default function Home() {
               color="gray.700"
               lineHeight="sm"
             >
-              Marcos!
+              {user.name}!
             </Text>
           </Flex>
         </Flex>
@@ -96,7 +103,7 @@ export default function Home() {
             </Stack>
           </Center>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("myAds")}>
             <Center flexDirection="row">
               <Text fontFamily="heading" color="blue.800" fontSize="xs" mr={2}>
                 Meus anúncios
@@ -148,6 +155,9 @@ export default function Home() {
         ListHeaderComponent={ListHeader}
         stickyHeaderIndices={[0]}
         stickyHeaderHiddenOnScroll
+        ListEmptyComponent={() => (
+          <Text color="gray.500">Nenhum anúncio encontrado :(</Text>
+        )}
       />
 
       <Filter modalizeRef={modalizeRef} />

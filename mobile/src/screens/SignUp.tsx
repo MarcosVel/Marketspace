@@ -183,24 +183,17 @@ export default function SignUp() {
         <Box mb={10}>
           <Center>
             <Pressable mb={4} onPress={handleAvatarSelection}>
-              {avatarIsLoading ? (
-                <Skeleton
-                  w={88}
-                  h={88}
-                  rounded="full"
-                  startColor="gray.300"
-                  endColor="gray.400"
-                  borderWidth={3}
-                  borderColor="blue.400"
-                />
-              ) : (
-                <UserAvatar
-                  width={88}
-                  height={88}
-                  borderWidth={3}
-                  avatarUrl={userPhotoFile.uri}
-                />
-              )}
+              <UserAvatar
+                width={88}
+                height={88}
+                borderWidth={3}
+                avatarIsLoading={avatarIsLoading}
+                source={
+                  userPhotoFile
+                    ? { uri: userPhotoFile.uri }
+                    : require("../assets/emptyAvatar.png")
+                }
+              />
               <NativeBase
                 w={10}
                 h={10}
