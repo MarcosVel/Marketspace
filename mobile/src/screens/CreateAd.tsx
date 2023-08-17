@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 import {
   Box,
   Checkbox,
@@ -19,7 +20,6 @@ import { useLayoutEffect, useState } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import Button from "../components/Button";
 import Input from "../components/Input";
-import * as ImagePicker from "expo-image-picker";
 
 type PhotoFileProps = {
   uri: string;
@@ -81,7 +81,15 @@ export default function CreateAd() {
     }
   }
 
-  console.log("images", images);
+  function handleRemoveImage(image: PhotoFileProps) {
+    try {
+      setImages((prevImages) =>
+        prevImages.filter((img) => img.uri !== image.uri)
+      );
+    } catch (error) {
+      console.log("error on handleRemoveImage:", error);
+    }
+  }
 
   return (
     <>
@@ -127,6 +135,7 @@ export default function CreateAd() {
                       }}
                       activeOpacity={0.4}
                       hitSlop={20}
+                      onPress={() => handleRemoveImage(item)}
                     >
                       <X size={12} color="#fff" />
                     </TouchableOpacity>
