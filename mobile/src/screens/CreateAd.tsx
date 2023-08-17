@@ -15,18 +15,21 @@ import {
   VStack,
 } from "native-base";
 import { ArrowLeft, Plus, X } from "phosphor-react-native";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import * as ImagePicker from "expo-image-picker";
+
+type PhotoFileProps = {
+  uri: string;
+  type: string;
+  name: string;
+};
 
 export default function CreateAd() {
   const navigation = useNavigation();
-  const images = [
-    "https://lasmagrelas.com.br/wp-content/uploads/2021/10/IMG_3705.png",
-    "https://motociclismoonline.com.br/wp-content/uploads/2022/04/Yamaha-MT-03_Renato-Duraes.jpg",
-    "https://lasmagrelas.com.br/wp-content/uploads/2021/10/IMG_3705.png",
-  ];
+  const [images, setImages] = useState<PhotoFileProps[]>([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -39,6 +42,46 @@ export default function CreateAd() {
       ),
     });
   }, []);
+
+  async function handleProductsImages() {
+    try {
+      const photosSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        aspect: [1, 1],
+        quality: 1,
+        allowsMultipleSelection: true,
+        selectionLimit: 3,
+        orderedSelection: true,
+      });
+
+      if (photosSelected.canceled) return;
+
+      if (photosSelected.assets) {
+        const newSelectedPhotos = photosSelected.assets.map((photo) => {
+          const filesExtension = photo.uri.split(".").pop();
+
+          const photoName = photo.uri.split("/");
+
+          const photoFile = {
+            uri: photo.uri,
+            type: `${photo.type}/${filesExtension}`,
+            name: `${photoName[photoName.length - 1]}`,
+          };
+
+          return photoFile;
+        });
+
+        setImages((prevSelectedPhotos) => [
+          ...prevSelectedPhotos,
+          ...newSelectedPhotos,
+        ]);
+      }
+    } catch (error) {
+      console.log("error on handleProductsImages:", error);
+    }
+  }
+
+  console.log("images", images);
 
   return (
     <>
@@ -61,13 +104,13 @@ export default function CreateAd() {
             <Flex flexDirection="row" alignItems="center" mb={8}>
               <FlatList
                 data={images}
-                keyExtractor={(item) => item}
+                keyExtractor={(item) => item.uri}
                 showsHorizontalScrollIndicator={false}
                 horizontal
                 renderItem={({ item }) => (
                   <Box>
                     <Image
-                      source={{ uri: item }}
+                      source={{ uri: item.uri }}
                       h={100}
                       w={100}
                       rounded="md"
@@ -104,6 +147,7 @@ export default function CreateAd() {
                       justifyContent: "center",
                       backgroundColor: "#D9D8DA",
                     }}
+                    onPress={handleProductsImages}
                   >
                     <Plus size={24} color="#9F9BA1" />
                   </TouchableOpacity>
