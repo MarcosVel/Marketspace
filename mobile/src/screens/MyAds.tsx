@@ -52,7 +52,7 @@ export default function MyAds() {
       bg="gray.200"
     >
       <Text fontFamily="body" color="gray.600">
-        {myAds.length} anúncios
+        {myAds.length} anúncio(s)
       </Text>
 
       <Select
@@ -86,7 +86,7 @@ export default function MyAds() {
       ) : (
         <FlatList
           data={myAds}
-          renderItem={({ item }) => <Item />}
+          renderItem={({ item }) => <Item data={item} />}
           numColumns={2}
           contentContainerStyle={{
             paddingHorizontal: 24,
