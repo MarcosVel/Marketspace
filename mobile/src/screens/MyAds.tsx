@@ -1,15 +1,18 @@
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Center, FlatList, Select, Text } from "native-base";
 import { CaretDown, Plus } from "phosphor-react-native";
-import { useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import Item from "../components/Item";
+import Loading from "../components/Loading";
 import { AppNavigationProps } from "../routes/app.routes";
+import api from "../services/api";
 
 export default function MyAds() {
   const navigation = useNavigation<AppNavigationProps>();
   const [filter, setFilter] = useState<"all" | "actives" | "inactives">("all");
-  const list = Array(5).fill(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [myAds, setMyAds] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -21,6 +24,26 @@ export default function MyAds() {
     });
   }, []);
 
+  async function fetchMyAds() {
+    try {
+      setIsLoading(true);
+
+      const response = await api.get("/users/products");
+
+      setMyAds(response.data);
+    } catch (error) {
+      console.log("error on fetchMyAds:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMyAds();
+    }, [])
+  );
+
   const ListHeader = () => (
     <Center
       flexDirection="row"
@@ -29,7 +52,7 @@ export default function MyAds() {
       bg="gray.200"
     >
       <Text fontFamily="body" color="gray.600">
-        9 anúncios
+        {myAds.length} anúncios
       </Text>
 
       <Select
@@ -58,23 +81,30 @@ export default function MyAds() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
-      <FlatList
-        data={list}
-        renderItem={({ item }) => <Item />}
-        numColumns={2}
-        contentContainerStyle={{
-          paddingHorizontal: 24,
-          paddingBottom: 36,
-          gap: 24,
-        }}
-        columnWrapperStyle={{
-          gap: 20,
-        }}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={ListHeader}
-        stickyHeaderIndices={[0]}
-        stickyHeaderHiddenOnScroll
-      />
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <FlatList
+          data={myAds}
+          renderItem={({ item }) => <Item />}
+          numColumns={2}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingBottom: 36,
+            gap: 24,
+          }}
+          columnWrapperStyle={{
+            gap: 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={ListHeader}
+          stickyHeaderIndices={[0]}
+          stickyHeaderHiddenOnScroll
+          ListEmptyComponent={() => (
+            <Text color="gray.500">Você ainda não possui nenhum anúncio.</Text>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
