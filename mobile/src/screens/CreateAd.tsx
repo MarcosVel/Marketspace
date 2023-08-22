@@ -110,12 +110,10 @@ export default function CreateAd() {
         const newSelectedPhotos = photosSelected.assets.map((photo) => {
           const filesExtension = photo.uri.split(".").pop();
 
-          const photoName = photo.uri.split("/");
-
           const photoFile = {
             uri: photo.uri,
             type: `${photo.type}/${filesExtension}`,
-            name: `${photoName[photoName.length - 1]}`,
+            name: `${Date.now()}.${filesExtension}`,
           };
 
           return photoFile;
@@ -169,9 +167,7 @@ export default function CreateAd() {
       formData.append("product_id", data.id);
       // Convert and append each image to the formData
       images.forEach((image) => {
-        const blob = new Blob([image.uri], { type: image.type });
-        const file = new File([blob], image.name);
-        formData.append("images", file);
+        formData.append("images", image);
       });
 
       await api

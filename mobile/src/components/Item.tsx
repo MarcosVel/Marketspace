@@ -1,17 +1,37 @@
 import { useNavigation } from "@react-navigation/native";
 import { Box, Flex, Image, Text } from "native-base";
+import { useContext } from "react";
 import { Dimensions, TouchableOpacity } from "react-native";
+import { AuthContext } from "../contexts/AuthContext";
 import { AppNavigationProps } from "../routes/app.routes";
+import api from "../services/api";
 import UserAvatar from "./UserAvatar";
 
 const { width } = Dimensions.get("window");
 
-export default function Item() {
+type ItemProps = {
+  data: {
+    product_images: string[];
+    name: string;
+    description: string;
+    is_new: boolean;
+    price: number;
+    accept_trade: boolean;
+    payment_methods: string[];
+    is_active: boolean;
+  };
+};
+
+export default function Item({ data }: ItemProps) {
+  const { user } = useContext(AuthContext);
   const navigation = useNavigation<AppNavigationProps>();
+
+  console.log("data: ", data);
 
   return (
     <TouchableOpacity
       style={{
+        flex: 1,
         flexGrow: 1,
         maxWidth: width / 2 - 34,
       }}
@@ -20,7 +40,9 @@ export default function Item() {
     >
       <Box>
         <Image
-          source={{ uri: "https://wallpaperaccess.com/full/317501.jpg" }}
+          source={{
+            uri: `${api.defaults.baseURL}/images/${data?.product_images[0]?.path}`,
+          }}
           alt="Item"
           w="full"
           h={100}
@@ -36,11 +58,12 @@ export default function Item() {
           position="absolute"
           top={1}
           left={1}
+          avatarUrl={user.avatar}
         />
 
         <Box
           rounded="full"
-          bg="gray.600"
+          bg={data.is_new ? "blue.800" : "gray.600"}
           alignItems="center"
           justifyContent="center"
           px={2}
@@ -50,7 +73,7 @@ export default function Item() {
           right={1}
         >
           <Text fontFamily="heading" fontSize="2xs" color="gray.100">
-            USADO
+            {data.is_new ? "NOVO" : "USADO"}
           </Text>
         </Box>
       </Box>
@@ -62,14 +85,14 @@ export default function Item() {
           numberOfLines={1}
           lineHeight="xs"
         >
-          Bicicleta
+          {data.name}
         </Text>
         <Flex flexDirection="row" alignItems="baseline">
           <Text fontFamily="heading" fontSize="xs" color="gray.700">
             R$
           </Text>
           <Text fontFamily="heading" fontSize="md" color="gray.700" ml={0.5}>
-            54,90
+            {data.price.toFixed(2).replace(".", ",")}
           </Text>
         </Flex>
       </Box>
