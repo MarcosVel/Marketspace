@@ -11,6 +11,7 @@ const { width } = Dimensions.get("window");
 
 type ItemProps = {
   data: {
+    id: string;
     product_images: [
       {
         path: string;
@@ -23,6 +24,7 @@ type ItemProps = {
     accept_trade: boolean;
     payment_methods: string[];
     is_active: boolean;
+    user_id: string;
   };
 };
 
@@ -38,7 +40,12 @@ export default function Item({ data }: ItemProps) {
         maxWidth: width / 2 - 34,
       }}
       activeOpacity={0.6}
-      onPress={() => navigation.navigate("details")}
+      onPress={() =>
+        navigation.navigate("details", {
+          product_id: data.id,
+          user_id: data.user_id,
+        })
+      }
     >
       <Box>
         <Image

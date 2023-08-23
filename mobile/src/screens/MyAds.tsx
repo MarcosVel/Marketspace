@@ -10,7 +10,9 @@ import api from "../services/api";
 
 export default function MyAds() {
   const navigation = useNavigation<AppNavigationProps>();
-  const [filter, setFilter] = useState<"all" | "actives" | "inactives">("all");
+  const [filter, setFilter] = useState<"all" | "actives" | "inactives">(
+    "all"
+  ); /** @todo implement filter */
   const [isLoading, setIsLoading] = useState(false);
   const [myAds, setMyAds] = useState([]);
 
@@ -43,6 +45,8 @@ export default function MyAds() {
       fetchMyAds();
     }, [])
   );
+
+  console.log("myAds:", myAds);
 
   const ListHeader = () => (
     <Center
