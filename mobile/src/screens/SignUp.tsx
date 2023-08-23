@@ -8,7 +8,6 @@ import {
   Button as NativeBase,
   Pressable,
   ScrollView,
-  Skeleton,
   Text,
   useToast,
 } from "native-base";
@@ -71,7 +70,7 @@ export default function SignUp() {
   });
   const [hidePassword, setHidePassword] = useState(true);
   const [avatarIsLoading, setAvatarIsLoading] = useState(false);
-  const [userPhotoFile, setUserPhotoFile] = useState("");
+  const [userPhotoFile, setUserPhotoFile] = useState({} as any);
 
   async function handleAvatarSelection() {
     try {
@@ -123,9 +122,7 @@ export default function SignUp() {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then((response) => {
-        console.log(response.data);
-
+      .then(() => {
         toast.show({
           title: "Conta criada com sucesso!",
         });
@@ -189,7 +186,7 @@ export default function SignUp() {
                 borderWidth={3}
                 avatarIsLoading={avatarIsLoading}
                 source={
-                  userPhotoFile
+                  userPhotoFile.uri
                     ? { uri: userPhotoFile.uri }
                     : require("../assets/emptyAvatar.png")
                 }

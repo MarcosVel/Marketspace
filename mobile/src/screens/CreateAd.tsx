@@ -79,7 +79,6 @@ export default function CreateAd() {
     resolver: yupResolver(createAdSchema),
   });
   const [images, setImages] = useState<PhotoFileProps[]>([]);
-  const [groupValues, setGroupValues] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

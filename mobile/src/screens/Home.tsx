@@ -7,26 +7,48 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Button from "../components/Button";
 import Filter from "../components/Filter";
 import Input from "../components/Input";
 import Item from "../components/Item";
+import Loading from "../components/Loading";
 import UserAvatar from "../components/UserAvatar";
 import { AuthContext } from "../contexts/AuthContext";
 import { AppNavigationProps } from "../routes/app.routes";
+import api from "../services/api";
 
 export default function Home() {
   const { user } = useContext(AuthContext);
   const navigation = useNavigation<AppNavigationProps>();
   const modalizeRef = useRef<Modalize>(null);
-  const list = Array(40).fill(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState([]);
 
   const onOpenFilter = () => {
     modalizeRef.current?.open();
   };
+
+  async function fetchProducts() {
+    try {
+      setIsLoading(true);
+
+      const { data } = await api.get("/products");
+      setProducts(data);
+    } catch (error) {
+      console.log("error on fetchProducts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  console.log(products);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const ListHeader = () => (
     <Box bg="gray.200" pt={6}>
@@ -139,26 +161,30 @@ export default function Home() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
-      <FlatList
-        data={list}
-        renderItem={({ item }) => <Item />}
-        numColumns={2}
-        contentContainerStyle={{
-          paddingHorizontal: 24,
-          paddingBottom: 36,
-          gap: 24,
-        }}
-        columnWrapperStyle={{
-          gap: 20,
-        }}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={ListHeader}
-        stickyHeaderIndices={[0]}
-        stickyHeaderHiddenOnScroll
-        ListEmptyComponent={() => (
-          <Text color="gray.500">Nenhum anúncio encontrado :(</Text>
-        )}
-      />
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <FlatList
+          data={products}
+          renderItem={({ item }) => <Item data={item} />}
+          numColumns={2}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingBottom: 36,
+            gap: 24,
+          }}
+          columnWrapperStyle={{
+            gap: 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={ListHeader}
+          stickyHeaderIndices={[0]}
+          stickyHeaderHiddenOnScroll
+          ListEmptyComponent={() => (
+            <Text color="gray.500">Nenhum anúncio encontrado :(</Text>
+          )}
+        />
+      )}
 
       <Filter modalizeRef={modalizeRef} />
     </SafeAreaView>

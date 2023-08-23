@@ -11,7 +11,11 @@ const { width } = Dimensions.get("window");
 
 type ItemProps = {
   data: {
-    product_images: string[];
+    product_images: [
+      {
+        path: string;
+      }
+    ];
     name: string;
     description: string;
     is_new: boolean;
@@ -26,8 +30,6 @@ export default function Item({ data }: ItemProps) {
   const { user } = useContext(AuthContext);
   const navigation = useNavigation<AppNavigationProps>();
 
-  console.log("data: ", data);
-
   return (
     <TouchableOpacity
       style={{
@@ -41,7 +43,7 @@ export default function Item({ data }: ItemProps) {
       <Box>
         <Image
           source={{
-            uri: `${api.defaults.baseURL}/images/${data?.product_images[0]?.path}`,
+            uri: `${api.defaults.baseURL}/images/${data.product_images[0].path}`,
           }}
           alt="Item"
           w="full"
