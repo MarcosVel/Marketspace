@@ -12,7 +12,7 @@ import Home from "../screens/Home";
 import MyAds from "../screens/MyAds";
 
 type AppRoutes = {
-  details: undefined;
+  details: { product_id: string; user_id: string };
   createAd: undefined;
   myAds: undefined;
 };
