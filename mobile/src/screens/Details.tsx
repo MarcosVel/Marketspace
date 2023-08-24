@@ -19,11 +19,19 @@ import {
   Barcode,
   CreditCard,
   Money,
+  PencilSimpleLine,
+  Power,
   QrCode,
+  TrashSimple,
   WhatsappLogo,
 } from "phosphor-react-native";
 import { useCallback, useLayoutEffect, useState } from "react";
-import { Dimensions, SafeAreaView, TouchableOpacity } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import Button from "../components/Button";
 import Loading from "../components/Loading";
@@ -80,6 +88,12 @@ export default function Details() {
           <ArrowLeft size={24} color="#1A181B" />
         </TouchableOpacity>
       ),
+      headerRight: () =>
+        user_id && (
+          <TouchableOpacity onPress={() => {}}>
+            <PencilSimpleLine size={24} color="#1A181B" />
+          </TouchableOpacity>
+        ),
     });
   }, []);
 
@@ -91,6 +105,34 @@ export default function Details() {
       setProduct(data);
     } catch (error) {
       console.log("error on fetchProduct:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function deleteAd() {
+    try {
+      setIsLoading(true);
+
+      Alert.alert(
+        "Excluir anúncio",
+        "Tem certeza que deseja excluir este anúncio?",
+        [
+          {
+            text: "Cancelar",
+            style: "cancel",
+          },
+          {
+            text: "Excluir",
+            onPress: async () => {
+              await api.delete(`/products/${product_id}`);
+              navigation.navigate("myAds");
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.log("error on deleteAd:", error);
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +155,7 @@ export default function Details() {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
-              paddingBottom: 64,
+              paddingBottom: user_id ? 16 : 64,
             }}
           >
             <Carousel
@@ -268,45 +310,68 @@ export default function Details() {
                 </Flex>
               </Flex>
             </Box>
+
+            {user_id && (
+              <VStack px={6} space={2}>
+                <Button
+                  title="Desativar anúncio"
+                  variant="dark"
+                  leftIcon={
+                    <Power size={16} color="#EDECEE" weight="regular" />
+                  }
+                  onPress={() => {}} /** @todo deactivate ad */
+                />
+
+                <Button
+                  title="Excluir anúncio"
+                  leftIcon={
+                    <TrashSimple size={16} color="#5F5B62" weight="regular" />
+                  }
+                  onPress={deleteAd}
+                />
+              </VStack>
+            )}
           </ScrollView>
 
-          <Box
-            pt={5}
-            px={6}
-            pb={8}
-            bg="gray.100"
-            w="full"
-            justifyContent="space-between"
-            alignItems="center"
-            position="absolute"
-            bottom={0}
-            flexDirection="row"
-          >
-            <Flex flexDirection="row" alignItems="baseline">
-              <Text fontFamily="heading" color="blue.400">
-                R$
-              </Text>
-              <Text
-                fontFamily="heading"
-                fontSize="xl"
-                color="blue.400"
-                lineHeight="md"
-                ml={0.5}
-              >
-                {product?.price?.toFixed(2).replace(".", ",")}
-              </Text>
-            </Flex>
+          {!user_id && (
+            <Box
+              pt={5}
+              px={6}
+              pb={8}
+              bg="gray.100"
+              w="full"
+              justifyContent="space-between"
+              alignItems="center"
+              position="absolute"
+              bottom={0}
+              flexDirection="row"
+            >
+              <Flex flexDirection="row" alignItems="baseline">
+                <Text fontFamily="heading" color="blue.400">
+                  R$
+                </Text>
+                <Text
+                  fontFamily="heading"
+                  fontSize="xl"
+                  color="blue.400"
+                  lineHeight="md"
+                  ml={0.5}
+                >
+                  {product?.price?.toFixed(2).replace(".", ",")}
+                </Text>
+              </Flex>
 
-            <Button
-              title="Entrar em contato"
-              w={null}
-              variant="blue"
-              leftIcon={
-                <WhatsappLogo size={16} color="#EDECEE" weight="fill" />
-              }
-              onPress={() => {}} /** @todo send to wpp number */
-            />
-          </Box>
+              <Button
+                title="Entrar em contato"
+                w={null}
+                variant="blue"
+                leftIcon={
+                  <WhatsappLogo size={16} color="#EDECEE" weight="fill" />
+                }
+                onPress={() => {}} /** @todo send to wpp number */
+              />
+            </Box>
+          )}
         </>
       )}
     </SafeAreaView>
