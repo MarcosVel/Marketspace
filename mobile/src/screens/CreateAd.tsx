@@ -138,7 +138,7 @@ export default function CreateAd() {
     }
   }
 
-  async function handleAdCreation({
+  function handlePreVisualization({
     name,
     description,
     is_new,
@@ -153,39 +153,17 @@ export default function CreateAd() {
         });
       }
 
-      const { data } = await api.post("/products", {
+      navigation.navigate("prePublish", {
+        product_images: images,
         name,
         description,
-        is_new: is_new === "new" ? true : false,
+        is_new,
         price,
         accept_trade,
         payment_methods,
       });
-
-      const formData = new FormData();
-      formData.append("product_id", data.id);
-      // Convert and append each image to the formData
-      images.forEach((image) => {
-        formData.append("images", image);
-      });
-
-      await api
-        .post("/products/images", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then(() => {
-          toast.show({
-            title: "Anúncio criado com sucesso!",
-          });
-          navigation.navigate("myAds");
-        })
-        .catch((error) => {
-          console.log("error to add product images:", error);
-        });
     } catch (error) {
-      console.log("error on handleAdCreation:", error);
+      console.log("error on handlePreVisualization:", error);
     }
   }
 
@@ -549,7 +527,7 @@ export default function CreateAd() {
                 <Button
                   title="Avançar"
                   variant="dark"
-                  onPress={handleSubmit(handleAdCreation)}
+                  onPress={handleSubmit(handlePreVisualization)}
                 />
               </HStack>
             </Box>

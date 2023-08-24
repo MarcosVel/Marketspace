@@ -10,11 +10,25 @@ import CreateAd from "../screens/CreateAd";
 import Details from "../screens/Details";
 import Home from "../screens/Home";
 import MyAds from "../screens/MyAds";
+import PrePublishAd from "../screens/PrePublishAd";
 
 type AppRoutes = {
   details: { product_id: string; user_id: string };
   createAd: undefined;
   myAds: undefined;
+  prePublish: {
+    product_images: {
+      name: string;
+      uri: string;
+      type: string;
+    }[];
+    name: string;
+    description: string;
+    is_new: string;
+    price: number;
+    accept_trade: boolean;
+    payment_methods: string[];
+  };
 };
 
 export type AppNavigationProps = NativeStackNavigationProp<AppRoutes>;
@@ -116,6 +130,7 @@ export function AppRoutes() {
       <Stack.Screen name="TabRoutes" component={TabRoutes} />
       <Stack.Screen name="details" component={Details} />
       <Stack.Screen name="createAd" component={CreateAd} />
+      <Stack.Screen name="prePublish" component={PrePublishAd} />
     </Stack.Navigator>
   );
 }
