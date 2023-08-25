@@ -62,17 +62,6 @@ export default function PrePublishAd() {
   } = params as ParamsProps;
   const navigation = useNavigation<AppNavigationProps>();
 
-  console.log(
-    "product param:",
-    product_images,
-    name,
-    description,
-    is_new,
-    price,
-    accept_trade,
-    payment_methods
-  );
-
   async function handleAdCreation() {
     try {
       const { data } = await api.post("/products", {

@@ -12,6 +12,7 @@ import {
   ScrollView,
   Text,
   VStack,
+  View,
 } from "native-base";
 import {
   ArrowLeft,
@@ -76,8 +77,8 @@ export default function Details() {
   const navigation = useNavigation<AppNavigationProps>();
   const [isLoading, setIsLoading] = useState(false);
   const [product, setProduct] = useState<ProductProps>({} as ProductProps);
-
-  console.log(product_id, user_id);
+  const [updatingActiveState, setUpdatingActiveState] = useState(false);
+  const [productIsActive, setProductIsActive] = useState(true);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -100,13 +101,16 @@ export default function Details() {
   async function fetchProduct() {
     try {
       setIsLoading(true);
+      setUpdatingActiveState(true);
 
       const { data } = await api.get(`/products/${product_id}`);
       setProduct(data);
+      setProductIsActive(data.is_active);
     } catch (error) {
       console.log("error on fetchProduct:", error);
     } finally {
       setIsLoading(false);
+      setUpdatingActiveState(false);
     }
   }
 
@@ -138,6 +142,22 @@ export default function Details() {
     }
   }
 
+  async function handleDeactivationAndActivation() {
+    try {
+      setUpdatingActiveState(true);
+
+      await api.patch(`/products/${product_id}`, {
+        is_active: !productIsActive,
+      });
+
+      setProductIsActive(!productIsActive);
+    } catch (error) {
+      console.log("error on handleDeactivation:", error);
+    } finally {
+      setUpdatingActiveState(false);
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       fetchProduct();
@@ -164,14 +184,31 @@ export default function Details() {
               data={product.product_images}
               loop={product?.product_images?.length > 1}
               renderItem={({ item }) => (
-                <Image
-                  source={{
-                    uri: `${api.defaults.baseURL}/images/${item.path}`,
-                  }}
-                  w="full"
-                  h={280}
-                  alt="item"
-                />
+                <>
+                  {!productIsActive && (
+                    <View
+                      w="full"
+                      h={280}
+                      bg="rgba(26, 24, 27, 0.6)" // gray.700
+                      position="absolute"
+                      zIndex={99}
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Text fontFamily="heading" fontSize="sm" color="white">
+                        ANÚNCIO DESATIVADO
+                      </Text>
+                    </View>
+                  )}
+                  <Image
+                    source={{
+                      uri: `${api.defaults.baseURL}/images/${item.path}`,
+                    }}
+                    w="full"
+                    h={280}
+                    alt="item"
+                  />
+                </>
               )}
             />
 
@@ -314,12 +351,15 @@ export default function Details() {
             {user_id && (
               <VStack px={6} space={2}>
                 <Button
-                  title="Desativar anúncio"
-                  variant="dark"
+                  title={
+                    productIsActive ? "Desativar anúncio" : "Reativar anúncio"
+                  }
+                  variant={productIsActive ? "dark" : "blue"}
                   leftIcon={
                     <Power size={16} color="#EDECEE" weight="regular" />
                   }
-                  onPress={() => {}} /** @todo deactivate ad */
+                  onPress={handleDeactivationAndActivation}
+                  isLoading={updatingActiveState}
                 />
 
                 <Button
