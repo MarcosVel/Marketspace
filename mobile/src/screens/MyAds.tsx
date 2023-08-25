@@ -15,6 +15,7 @@ export default function MyAds() {
   ); /** @todo implement filter */
   const [isLoading, setIsLoading] = useState(false);
   const [myAds, setMyAds] = useState([]);
+  const [allMyAds, setAllMyAds] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -33,10 +34,23 @@ export default function MyAds() {
       const response = await api.get("/users/products");
 
       setMyAds(response.data);
+      setAllMyAds(response.data);
     } catch (error) {
       console.log("error on fetchMyAds:", error);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  function handleFilter(type: string) {
+    setFilter(type as "all" | "actives" | "inactives");
+
+    if (type === "actives") {
+      setMyAds(allMyAds.filter((items) => items.is_active === true));
+    } else if (type === "inactives") {
+      setMyAds(allMyAds.filter((items) => items.is_active === false));
+    } else {
+      setMyAds(allMyAds);
     }
   }
 
@@ -62,6 +76,7 @@ export default function MyAds() {
       <Select
         selectedValue={filter}
         defaultValue={filter}
+        onValueChange={(selected) => handleFilter(selected)}
         minW={32}
         accessibilityLabel="Filter by"
         color="gray.700"
