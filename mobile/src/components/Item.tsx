@@ -26,9 +26,10 @@ type ItemProps = {
     is_active: boolean;
     user_id: string;
   };
+  homeItem?: boolean;
 };
 
-export default function Item({ data }: ItemProps) {
+export default function Item({ data, homeItem }: ItemProps) {
   const { user } = useContext(AuthContext);
   const navigation = useNavigation<AppNavigationProps>();
 
@@ -48,22 +49,23 @@ export default function Item({ data }: ItemProps) {
       }
     >
       <Box>
-        {!data.is_active && (
-          <View
-            w="full"
-            h={100}
-            bg="rgba(26, 24, 27, 0.6)" // gray.700
-            position="absolute"
-            zIndex={99}
-            justifyContent="flex-end"
-            rounded={6}
-            p={2}
-          >
-            <Text fontFamily="heading" fontSize="xs" color="white">
-              ANÚNCIO DESATIVADO
-            </Text>
-          </View>
-        )}
+        {homeItem ||
+          (!data.is_active && (
+            <View
+              w="full"
+              h={100}
+              bg="rgba(26, 24, 27, 0.6)" // gray.700
+              position="absolute"
+              zIndex={99}
+              justifyContent="flex-end"
+              rounded={6}
+              p={2}
+            >
+              <Text fontFamily="heading" fontSize="xs" color="white">
+                ANÚNCIO DESATIVADO
+              </Text>
+            </View>
+          ))}
         <Image
           source={{
             uri: `${api.defaults.baseURL}/images/${data.product_images[0].path}`,
@@ -106,7 +108,7 @@ export default function Item({ data }: ItemProps) {
       <Box px={1}>
         <Text
           fontFamily="body"
-          color={data.is_active ? "gray.600" : "gray.400"}
+          color={homeItem || data.is_active ? "gray.600" : "gray.400"}
           numberOfLines={1}
           lineHeight="xs"
         >
@@ -116,14 +118,14 @@ export default function Item({ data }: ItemProps) {
           <Text
             fontFamily="heading"
             fontSize="xs"
-            color={data.is_active ? "gray.700" : "gray.400"}
+            color={homeItem || data.is_active ? "gray.700" : "gray.400"}
           >
             R$
           </Text>
           <Text
             fontFamily="heading"
             fontSize="md"
-            color={data.is_active ? "gray.700" : "gray.400"}
+            color={homeItem || data.is_active ? "gray.700" : "gray.400"}
             ml={0.5}
           >
             {data.price.toFixed(2).replace(".", ",")}

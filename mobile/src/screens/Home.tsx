@@ -44,6 +44,8 @@ export default function Home() {
     }
   }
 
+  console.log("products:", products);
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -164,7 +166,7 @@ export default function Home() {
       ) : (
         <FlatList
           data={products}
-          renderItem={({ item }) => <Item data={item} />}
+          renderItem={({ item }) => <Item data={item} homeItem={true} />}
           numColumns={2}
           contentContainerStyle={{
             paddingHorizontal: 24,
