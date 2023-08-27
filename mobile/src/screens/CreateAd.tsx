@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import {
   Box,
@@ -19,12 +19,13 @@ import {
   useToast,
 } from "native-base";
 import { ArrowLeft, Plus, X } from "phosphor-react-native";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import * as yup from "yup";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import Loading from "../components/Loading";
 import { AppNavigationProps } from "../routes/app.routes";
 import api from "../services/api";
 
@@ -35,6 +36,7 @@ type PhotoFileProps = {
 };
 
 type FormDataProps = {
+  product_images?: PhotoFileProps[];
   name: string;
   description: string;
   is_new: string;
@@ -63,10 +65,13 @@ const createAdSchema = yup.object({
 
 export default function CreateAd() {
   const toast = useToast();
+  const { params } = useRoute();
   const navigation = useNavigation<AppNavigationProps>();
+  const [product, setProduct] = useState({});
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormDataProps>({
     defaultValues: {
@@ -79,6 +84,9 @@ export default function CreateAd() {
     resolver: yupResolver(createAdSchema),
   });
   const [images, setImages] = useState<PhotoFileProps[]>([]);
+  const [loadingData, setIsLoadingData] = useState(false);
+
+  console.log("params:", params);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -167,7 +175,39 @@ export default function CreateAd() {
     }
   }
 
-  return (
+  async function getProductData() {
+    try {
+      setIsLoadingData(true);
+
+      const { data } = await api.get(`/products/${params?.product_id}`);
+
+      setProduct(data);
+      reset({
+        name: data.name,
+        description: data.description,
+        is_new: data.is_new ? "new" : "used",
+        price: data.price.toString(),
+        accept_trade: data.accept_trade,
+        payment_methods: data.payment_methods.map((item) => item.key),
+      });
+    } catch (error) {
+      console.log("error on getProductData:", error);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }
+
+  useEffect(() => {
+    if (params) {
+      getProductData();
+    }
+  }, []);
+
+  console.log("product:", product);
+
+  return loadingData ? (
+    <Loading />
+  ) : (
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
         <ScrollView

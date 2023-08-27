@@ -14,7 +14,9 @@ import PrePublishAd from "../screens/PrePublishAd";
 
 type AppRoutes = {
   details: { product_id: string; user_id: string };
-  createAd: undefined;
+  createAd: {
+    product_id: string;
+  };
   myAds: undefined;
   prePublish: {
     product_images: {

@@ -91,7 +91,13 @@ export default function Details() {
       ),
       headerRight: () =>
         user_id && (
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("createAd", {
+                product_id: product_id,
+              })
+            }
+          >
             <PencilSimpleLine size={24} color="#1A181B" />
           </TouchableOpacity>
         ),
