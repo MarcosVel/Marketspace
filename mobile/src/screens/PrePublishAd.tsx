@@ -103,7 +103,6 @@ export default function PrePublishAd() {
 
   async function handleAdEdition() {
     try {
-      // const { data } =
       await api.put(`/products/${idProductToEdit}`, {
         name,
         description,
@@ -113,7 +112,26 @@ export default function PrePublishAd() {
         payment_methods,
       });
 
-      // if (product_images.uri) {}
+      if (product_images.some((item) => item.hasOwnProperty("uri"))) {
+        const formData = new FormData();
+        formData.append("product_id", idProductToEdit);
+        product_images.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        await api
+          .post("/products/images", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then(() => {
+            console.log("product images edited with success!");
+          })
+          .catch((error) => {
+            console.log("error to add product images:", error);
+          });
+      }
 
       toast.show({
         title: "Anúncio editado com sucesso!",
@@ -127,8 +145,6 @@ export default function PrePublishAd() {
       });
     }
   }
-
-  console.log("product_images:", product_images);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>

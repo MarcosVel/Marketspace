@@ -89,7 +89,7 @@ export default function CreateAd() {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      headerTitle: "Criar anúncio",
+      headerTitle: params ? "Editar anúncio" : "Criar anúncio",
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft size={24} color="#1A181B" />
