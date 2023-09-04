@@ -1,5 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
-import { Box, Center, FlatList, Flex, Stack, Text, VStack } from "native-base";
+import {
+  Box,
+  Center,
+  FlatList,
+  Flex,
+  Stack,
+  Text,
+  VStack,
+  useToast,
+} from "native-base";
 import {
   ArrowRight,
   MagnifyingGlass,
@@ -19,8 +28,10 @@ import UserAvatar from "../components/UserAvatar";
 import { AuthContext } from "../contexts/AuthContext";
 import { AppNavigationProps } from "../routes/app.routes";
 import api from "../services/api";
+import { AppError } from "../utils/AppError";
 
 export default function Home() {
+  const toast = useToast();
   const { user } = useContext(AuthContext);
   const navigation = useNavigation<AppNavigationProps>();
   const modalizeRef = useRef<Modalize>(null);
@@ -38,7 +49,15 @@ export default function Home() {
       const { data } = await api.get("/products");
       setProducts(data);
     } catch (error) {
-      console.log("error on fetchProducts:", error);
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar o histórico";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
     } finally {
       setIsLoading(false);
     }
