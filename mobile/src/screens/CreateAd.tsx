@@ -86,8 +86,6 @@ export default function CreateAd() {
   const [images, setImages] = useState<PhotoFileProps[]>([]);
   const [loadingData, setIsLoadingData] = useState(false);
 
-  console.log("params:", params);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
@@ -155,13 +153,14 @@ export default function CreateAd() {
     payment_methods,
   }: FormDataProps) {
     try {
-      if (images.length < 1) {
+      if (!params && images.length < 1) {
         return toast.show({
           title: "Selecione pelo menos uma imagem",
         });
       }
 
       navigation.navigate("prePublish", {
+        product_id: params?.product_id,
         product_images: images,
         name,
         description,
@@ -182,6 +181,7 @@ export default function CreateAd() {
       const { data } = await api.get(`/products/${params?.product_id}`);
 
       setProduct(data);
+      setImages(data.product_images);
       reset({
         name: data.name,
         description: data.description,
@@ -228,13 +228,17 @@ export default function CreateAd() {
             <Flex flexDirection="row" alignItems="center" mb={8}>
               <FlatList
                 data={images}
-                keyExtractor={(item) => item.uri}
+                keyExtractor={(item) => item.id || item.uri}
                 showsHorizontalScrollIndicator={false}
                 horizontal
                 renderItem={({ item }) => (
                   <Box>
                     <Image
-                      source={{ uri: item.uri }}
+                      source={{
+                        uri: item.uri
+                          ? item.uri
+                          : `${api.defaults.baseURL}/images/${item.path}`,
+                      }}
                       h={100}
                       w={100}
                       rounded="md"

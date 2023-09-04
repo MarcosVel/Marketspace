@@ -60,6 +60,7 @@ export default function PrePublishAd() {
     accept_trade,
     payment_methods,
   } = params as ParamsProps;
+  const idProductToEdit = params?.product_id;
   const navigation = useNavigation<AppNavigationProps>();
 
   async function handleAdCreation() {
@@ -100,6 +101,35 @@ export default function PrePublishAd() {
     }
   }
 
+  async function handleAdEdition() {
+    try {
+      // const { data } =
+      await api.put(`/products/${idProductToEdit}`, {
+        name,
+        description,
+        is_new: is_new === "new" ? true : false,
+        price,
+        accept_trade,
+        payment_methods,
+      });
+
+      // if (product_images.uri) {}
+
+      toast.show({
+        title: "Anúncio editado com sucesso!",
+      });
+      navigation.navigate("myAds");
+    } catch (error) {
+      console.log("error on handleAdEdition:", error);
+      toast.show({
+        title: "Erro ao editar anúncio!",
+        bgColor: "red.400",
+      });
+    }
+  }
+
+  console.log("product_images:", product_images);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
       <PreVisualization />
@@ -119,7 +149,9 @@ export default function PrePublishAd() {
           renderItem={({ item }) => (
             <Image
               source={{
-                uri: item.uri,
+                uri: item.uri
+                  ? item.uri
+                  : `${api.defaults.baseURL}/images/${item.path}`,
               }}
               w="full"
               h={280}
@@ -267,7 +299,7 @@ export default function PrePublishAd() {
             title="Publicar"
             variant="blue"
             leftIcon={<Tag size={16} color="#EDECEE" />}
-            onPress={handleAdCreation}
+            onPress={idProductToEdit ? handleAdEdition : handleAdCreation}
           />
         </HStack>
       </Box>

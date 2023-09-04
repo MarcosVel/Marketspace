@@ -19,6 +19,7 @@ type AppRoutes = {
   };
   myAds: undefined;
   prePublish: {
+    product_id: string;
     product_images: {
       name: string;
       uri: string;
