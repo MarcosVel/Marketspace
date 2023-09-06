@@ -45,6 +45,7 @@ type ParamsProps = {
   price: number;
   accept_trade: boolean;
   payment_methods: string[];
+  imagesToDelete: string[];
 };
 
 export default function PrePublishAd() {
@@ -59,6 +60,7 @@ export default function PrePublishAd() {
     price,
     accept_trade,
     payment_methods,
+    imagesToDelete,
   } = params as ParamsProps;
   const idProductToEdit = params?.product_id;
   const navigation = useNavigation<AppNavigationProps>();
@@ -100,6 +102,7 @@ export default function PrePublishAd() {
       console.log("error on handleAdCreation:", error);
     }
   }
+  console.log("imagesToDelete:", imagesToDelete);
 
   async function handleAdEdition() {
     try {
@@ -132,6 +135,18 @@ export default function PrePublishAd() {
             console.log("error to add product images:", error);
           });
       }
+
+      // if (imagesToDelete.length > 0) {
+      //   try {
+      //     await api.delete("/products/images", {
+      //       data: {
+      //         images: imagesToDelete,
+      //       },
+      //     });
+      //   } catch (error) {
+      //     console.log("error to delete images:", error);
+      //   }
+      // }
 
       toast.show({
         title: "Anúncio editado com sucesso!",

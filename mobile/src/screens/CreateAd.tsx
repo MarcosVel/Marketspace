@@ -33,6 +33,8 @@ type PhotoFileProps = {
   uri: string;
   type: string;
   name: string;
+  id?: string; // id is only used when editing an ad
+  path?: string; // path is only used when editing an ad
 };
 
 type FormDataProps = {
@@ -84,6 +86,7 @@ export default function CreateAd() {
     resolver: yupResolver(createAdSchema),
   });
   const [images, setImages] = useState<PhotoFileProps[]>([]);
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]); // only used when editing an ad
   const [loadingData, setIsLoadingData] = useState(false);
 
   useLayoutEffect(() => {
@@ -130,15 +133,28 @@ export default function CreateAd() {
         ]);
       }
     } catch (error) {
+      toast.show({
+        title: "Por favor selecione outra imagem",
+        bgColor: "red.400",
+      });
+
       console.log("error on handleProductsImages:", error);
     }
   }
 
   function handleRemoveImage(image: PhotoFileProps) {
     try {
-      setImages((prevImages) =>
-        prevImages.filter((img) => img.uri !== image.uri)
-      );
+      image.uri
+        ? setImages((prevImages) =>
+            prevImages.filter((img) => img.uri !== image.uri)
+          )
+        : (setImages((prevImages) =>
+            prevImages.filter((img) => img.path !== image.path)
+          ),
+          setImagesToDelete((prevImages) => [
+            ...prevImages,
+            image.id as string,
+          ]));
     } catch (error) {
       console.log("error on handleRemoveImage:", error);
     }
@@ -168,6 +184,7 @@ export default function CreateAd() {
         price,
         accept_trade,
         payment_methods,
+        imagesToDelete,
       });
     } catch (error) {
       console.log("error on handlePreVisualization:", error);

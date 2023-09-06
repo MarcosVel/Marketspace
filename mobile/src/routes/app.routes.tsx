@@ -31,6 +31,7 @@ type AppRoutes = {
     price: number;
     accept_trade: boolean;
     payment_methods: string[];
+    imagesToDelete: string[];
   };
 };
 
