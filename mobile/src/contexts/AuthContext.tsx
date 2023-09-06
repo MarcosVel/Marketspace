@@ -33,7 +33,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   function userAndTokenUpdate(userData: UserDTO, token: string) {
     try {
-      api.defaults.headers["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       setUser(userData);
     } catch (error) {
@@ -95,6 +95,14 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   useEffect(() => {
     loadUserData();
   }, []);
+
+  useEffect(() => {
+    const subscribe = api.registerInteceptTokenManager(signOut);
+
+    return () => {
+      subscribe();
+    };
+  }, [signOut]);
 
   return (
     <AuthContext.Provider value={{ user, signIn, isLoadingUser, signOut }}>

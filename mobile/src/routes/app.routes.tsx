@@ -14,9 +14,12 @@ import PrePublishAd from "../screens/PrePublishAd";
 
 type AppRoutes = {
   details: { product_id: string; user_id: string };
-  createAd: undefined;
+  createAd: {
+    product_id: string;
+  };
   myAds: undefined;
   prePublish: {
+    product_id: string;
     product_images: {
       name: string;
       uri: string;
@@ -28,6 +31,7 @@ type AppRoutes = {
     price: number;
     accept_trade: boolean;
     payment_methods: string[];
+    imagesToDelete: string[];
   };
 };
 

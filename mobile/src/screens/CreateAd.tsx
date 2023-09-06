@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import {
   Box,
@@ -19,12 +19,13 @@ import {
   useToast,
 } from "native-base";
 import { ArrowLeft, Plus, X } from "phosphor-react-native";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import * as yup from "yup";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import Loading from "../components/Loading";
 import { AppNavigationProps } from "../routes/app.routes";
 import api from "../services/api";
 
@@ -32,9 +33,12 @@ type PhotoFileProps = {
   uri: string;
   type: string;
   name: string;
+  id?: string; // id is only used when editing an ad
+  path?: string; // path is only used when editing an ad
 };
 
 type FormDataProps = {
+  product_images?: PhotoFileProps[];
   name: string;
   description: string;
   is_new: string;
@@ -63,10 +67,13 @@ const createAdSchema = yup.object({
 
 export default function CreateAd() {
   const toast = useToast();
+  const { params } = useRoute();
   const navigation = useNavigation<AppNavigationProps>();
+  const [product, setProduct] = useState({});
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormDataProps>({
     defaultValues: {
@@ -79,11 +86,13 @@ export default function CreateAd() {
     resolver: yupResolver(createAdSchema),
   });
   const [images, setImages] = useState<PhotoFileProps[]>([]);
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]); // only used when editing an ad
+  const [loadingData, setIsLoadingData] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      headerTitle: "Criar anúncio",
+      headerTitle: params ? "Editar anúncio" : "Criar anúncio",
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft size={24} color="#1A181B" />
@@ -124,15 +133,28 @@ export default function CreateAd() {
         ]);
       }
     } catch (error) {
+      toast.show({
+        title: "Por favor selecione outra imagem",
+        bgColor: "red.400",
+      });
+
       console.log("error on handleProductsImages:", error);
     }
   }
 
   function handleRemoveImage(image: PhotoFileProps) {
     try {
-      setImages((prevImages) =>
-        prevImages.filter((img) => img.uri !== image.uri)
-      );
+      image.uri
+        ? setImages((prevImages) =>
+            prevImages.filter((img) => img.uri !== image.uri)
+          )
+        : (setImages((prevImages) =>
+            prevImages.filter((img) => img.path !== image.path)
+          ),
+          setImagesToDelete((prevImages) => [
+            ...prevImages,
+            image.id as string,
+          ]));
     } catch (error) {
       console.log("error on handleRemoveImage:", error);
     }
@@ -147,13 +169,14 @@ export default function CreateAd() {
     payment_methods,
   }: FormDataProps) {
     try {
-      if (images.length < 1) {
+      if (!params && images.length < 1) {
         return toast.show({
           title: "Selecione pelo menos uma imagem",
         });
       }
 
       navigation.navigate("prePublish", {
+        product_id: params?.product_id,
         product_images: images,
         name,
         description,
@@ -161,13 +184,47 @@ export default function CreateAd() {
         price,
         accept_trade,
         payment_methods,
+        imagesToDelete,
       });
     } catch (error) {
       console.log("error on handlePreVisualization:", error);
     }
   }
 
-  return (
+  async function getProductData() {
+    try {
+      setIsLoadingData(true);
+
+      const { data } = await api.get(`/products/${params?.product_id}`);
+
+      setProduct(data);
+      setImages(data.product_images);
+      reset({
+        name: data.name,
+        description: data.description,
+        is_new: data.is_new ? "new" : "used",
+        price: data.price.toString(),
+        accept_trade: data.accept_trade,
+        payment_methods: data.payment_methods.map((item) => item.key),
+      });
+    } catch (error) {
+      console.log("error on getProductData:", error);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }
+
+  useEffect(() => {
+    if (params) {
+      getProductData();
+    }
+  }, []);
+
+  console.log("product:", product);
+
+  return loadingData ? (
+    <Loading />
+  ) : (
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
         <ScrollView
@@ -188,13 +245,17 @@ export default function CreateAd() {
             <Flex flexDirection="row" alignItems="center" mb={8}>
               <FlatList
                 data={images}
-                keyExtractor={(item) => item.uri}
+                keyExtractor={(item) => item.id || item.uri}
                 showsHorizontalScrollIndicator={false}
                 horizontal
                 renderItem={({ item }) => (
                   <Box>
                     <Image
-                      source={{ uri: item.uri }}
+                      source={{
+                        uri: item.uri
+                          ? item.uri
+                          : `${api.defaults.baseURL}/images/${item.path}`,
+                      }}
                       h={100}
                       w={100}
                       rounded="md"

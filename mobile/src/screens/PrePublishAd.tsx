@@ -45,6 +45,7 @@ type ParamsProps = {
   price: number;
   accept_trade: boolean;
   payment_methods: string[];
+  imagesToDelete: string[];
 };
 
 export default function PrePublishAd() {
@@ -59,7 +60,9 @@ export default function PrePublishAd() {
     price,
     accept_trade,
     payment_methods,
+    imagesToDelete,
   } = params as ParamsProps;
+  const idProductToEdit = params?.product_id;
   const navigation = useNavigation<AppNavigationProps>();
 
   async function handleAdCreation() {
@@ -99,6 +102,64 @@ export default function PrePublishAd() {
       console.log("error on handleAdCreation:", error);
     }
   }
+  console.log("imagesToDelete:", imagesToDelete);
+
+  async function handleAdEdition() {
+    try {
+      await api.put(`/products/${idProductToEdit}`, {
+        name,
+        description,
+        is_new: is_new === "new" ? true : false,
+        price,
+        accept_trade,
+        payment_methods,
+      });
+
+      if (product_images.some((item) => item.hasOwnProperty("uri"))) {
+        const formData = new FormData();
+        formData.append("product_id", idProductToEdit);
+        product_images.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        await api
+          .post("/products/images", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then(() => {
+            console.log("product images edited with success!");
+          })
+          .catch((error) => {
+            console.log("error to add product images:", error);
+          });
+      }
+
+      // if (imagesToDelete.length > 0) {
+      //   try {
+      //     await api.delete("/products/images", {
+      //       data: {
+      //         images: imagesToDelete,
+      //       },
+      //     });
+      //   } catch (error) {
+      //     console.log("error to delete images:", error);
+      //   }
+      // }
+
+      toast.show({
+        title: "Anúncio editado com sucesso!",
+      });
+      navigation.navigate("myAds");
+    } catch (error) {
+      console.log("error on handleAdEdition:", error);
+      toast.show({
+        title: "Erro ao editar anúncio!",
+        bgColor: "red.400",
+      });
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#EDECEE" }}>
@@ -119,7 +180,9 @@ export default function PrePublishAd() {
           renderItem={({ item }) => (
             <Image
               source={{
-                uri: item.uri,
+                uri: item.uri
+                  ? item.uri
+                  : `${api.defaults.baseURL}/images/${item.path}`,
               }}
               w="full"
               h={280}
@@ -267,7 +330,7 @@ export default function PrePublishAd() {
             title="Publicar"
             variant="blue"
             leftIcon={<Tag size={16} color="#EDECEE" />}
-            onPress={handleAdCreation}
+            onPress={idProductToEdit ? handleAdEdition : handleAdCreation}
           />
         </HStack>
       </Box>
