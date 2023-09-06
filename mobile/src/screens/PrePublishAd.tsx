@@ -136,17 +136,15 @@ export default function PrePublishAd() {
           });
       }
 
-      // if (imagesToDelete.length > 0) {
-      //   try {
-      //     await api.delete("/products/images", {
-      //       data: {
-      //         images: imagesToDelete,
-      //       },
-      //     });
-      //   } catch (error) {
-      //     console.log("error to delete images:", error);
-      //   }
-      // }
+      if (imagesToDelete.length > 0) {
+        try {
+          await api.delete("/products/images", {
+            data: { productImagesIds: imagesToDelete },
+          });
+        } catch (error) {
+          console.log("error to delete images:", error);
+        }
+      }
 
       toast.show({
         title: "Anúncio editado com sucesso!",
