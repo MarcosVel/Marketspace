@@ -681,7 +681,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "images": {
+                  "productImagesIds": {
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -870,9 +870,9 @@
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": ["pix", "card", "boleto", "cash", "deposit"],
-                      "example": ["pix", "card"]
-                    }
+                      "enum": ["pix", "card", "boleto", "cash", "deposit"]
+                    },
+                    "example": ["pix", "teste"]
                   }
                 }
               }
