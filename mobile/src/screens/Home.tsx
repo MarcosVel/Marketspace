@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import {
   Box,
   Center,
@@ -16,7 +16,7 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Button from "../components/Button";
@@ -37,6 +37,7 @@ export default function Home() {
   const modalizeRef = useRef<Modalize>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
+  const [myAdsLength, setMyAdsLength] = useState(0);
 
   const onOpenFilter = () => {
     modalizeRef.current?.open();
@@ -63,11 +64,34 @@ export default function Home() {
     }
   }
 
-  console.log("products:", products);
+  async function fetchMyAdsLength() {
+    try {
+      setIsLoading(true);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+      const { data } = await api.get("/users/products");
+
+      setMyAdsLength(data.length);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível a quantidade de seus anúncios";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProducts();
+      fetchMyAdsLength();
+    }, [])
+  );
 
   const ListHeader = () => (
     <Box bg="gray.200" pt={6}>
@@ -136,7 +160,7 @@ export default function Home() {
                 fontSize="lg"
                 lineHeight="xs"
               >
-                4
+                {myAdsLength}
               </Text>
               <Text fontFamily="body" color="gray.600" fontSize="xs">
                 anúncios ativos
