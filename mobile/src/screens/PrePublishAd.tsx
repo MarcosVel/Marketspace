@@ -19,7 +19,7 @@ import {
   QrCode,
   Tag,
 } from "phosphor-react-native";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Dimensions, SafeAreaView } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import Button from "../components/Button";
@@ -64,9 +64,12 @@ export default function PrePublishAd() {
   } = params as ParamsProps;
   const idProductToEdit = params?.product_id;
   const navigation = useNavigation<AppNavigationProps>();
+  const [loading, setLoading] = useState(false);
 
   async function handleAdCreation() {
     try {
+      setLoading(true);
+
       const { data } = await api.post("/products", {
         name,
         description,
@@ -98,7 +101,10 @@ export default function PrePublishAd() {
         .catch((error) => {
           console.log("error to add product images:", error);
         });
+
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log("error on handleAdCreation:", error);
     }
   }
@@ -106,6 +112,8 @@ export default function PrePublishAd() {
 
   async function handleAdEdition() {
     try {
+      setLoading(true);
+
       await api.put(`/products/${idProductToEdit}`, {
         name,
         description,
@@ -150,7 +158,11 @@ export default function PrePublishAd() {
         title: "Anúncio editado com sucesso!",
       });
       navigation.navigate("myAds");
+
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+
       console.log("error on handleAdEdition:", error);
       toast.show({
         title: "Erro ao editar anúncio!",
@@ -329,6 +341,7 @@ export default function PrePublishAd() {
             variant="blue"
             leftIcon={<Tag size={16} color="#EDECEE" />}
             onPress={idProductToEdit ? handleAdEdition : handleAdCreation}
+            isLoading={loading}
           />
         </HStack>
       </Box>

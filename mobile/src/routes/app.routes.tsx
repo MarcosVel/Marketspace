@@ -16,7 +16,7 @@ type AppRoutes = {
   details: { product_id: string; user_id: string };
   createAd: {
     product_id: string;
-  };
+  } | undefined;
   myAds: undefined;
   prePublish: {
     product_id: string;

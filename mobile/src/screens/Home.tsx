@@ -17,6 +17,7 @@ import {
   Tag,
 } from "phosphor-react-native";
 import { useContext, useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Button from "../components/Button";
@@ -30,6 +31,13 @@ import { AppNavigationProps } from "../routes/app.routes";
 import api from "../services/api";
 import { AppError } from "../utils/AppError";
 
+type SearchProductProps = {
+  searchProduct: string;
+  is_new: boolean;
+  accept_trade: boolean;
+  payment_methods: string[];
+};
+
 export default function Home() {
   const toast = useToast();
   const { user } = useContext(AuthContext);
@@ -37,6 +45,17 @@ export default function Home() {
   const modalizeRef = useRef<Modalize>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
+  const [myAdsLength, setMyAdsLength] = useState(0);
+  const { control, handleSubmit, getValues, reset } =
+    useForm<SearchProductProps>({
+      defaultValues: {
+        searchProduct: "",
+        is_new: true,
+        accept_trade: false,
+        payment_methods: ["pix", "card", "boleto", "cash", "deposit"],
+      },
+    });
+  const [isUsingFilter, setIsUsingFilter] = useState(false);
 
   const onOpenFilter = () => {
     modalizeRef.current?.open();
@@ -63,11 +82,120 @@ export default function Home() {
     }
   }
 
-  console.log("products:", products);
+  async function fetchMyAdsLength() {
+    try {
+      setIsLoading(true);
+
+      const { data } = await api.get("/users/products");
+
+      setMyAdsLength(data.length);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível a quantidade de seus anúncios";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleProductSearch({ searchProduct }: SearchProductProps) {
+    try {
+      if (!searchProduct) return;
+
+      setIsUsingFilter(true);
+
+      const { data } = await api.get(`/products?query=${searchProduct}`);
+
+      setProducts(data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar o histórico";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
+
+      setIsUsingFilter(false);
+    }
+  }
+
+  async function handleProductFilter({
+    is_new,
+    accept_trade,
+    payment_methods,
+  }: SearchProductProps) {
+    try {
+      setIsUsingFilter(true);
+
+      const { data } = await api.get("/products", {
+        params: {
+          is_new,
+          accept_trade,
+          payment_methods,
+        },
+      });
+
+      setProducts(data);
+
+      modalizeRef.current?.close();
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar o histórico";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
+
+      setIsUsingFilter(false);
+    }
+  }
+
+  function handleFilterReset() {
+    reset({
+      is_new: true,
+      accept_trade: false,
+      payment_methods: ["pix", "card", "boleto", "cash", "deposit"],
+    });
+    setIsUsingFilter(false);
+    fetchProducts();
+    modalizeRef.current?.close();
+  }
 
   useEffect(() => {
     fetchProducts();
+    fetchMyAdsLength();
   }, []);
+
+  const EmptyList = () => (
+    <Center>
+      <Text color="gray.500">Nenhum anúncio encontrado :(</Text>
+      {isUsingFilter && (
+        <Button
+          mt={4}
+          title="Resetar filtros"
+          variant="dark"
+          w={null}
+          onPress={() => {
+            setIsUsingFilter(false);
+            reset({ searchProduct: "" });
+            fetchProducts();
+          }}
+        />
+      )}
+    </Center>
+  );
 
   const ListHeader = () => (
     <Box bg="gray.200" pt={6}>
@@ -136,7 +264,7 @@ export default function Home() {
                 fontSize="lg"
                 lineHeight="xs"
               >
-                4
+                {myAdsLength}
               </Text>
               <Text fontFamily="body" color="gray.600" fontSize="xs">
                 anúncios ativos
@@ -160,19 +288,27 @@ export default function Home() {
           Compre produtos variados
         </Text>
 
-        <Input
-          placeholder="Buscar anúncio"
-          InputRightElement={
-            <Center flexDirection="row" mr={4}>
-              <TouchableOpacity>
-                <MagnifyingGlass size={20} color="#3E3A40" weight="bold" />
-              </TouchableOpacity>
-              <Box w="1px" bg="gray.400" h="5" mx={3} />
-              <TouchableOpacity onPress={onOpenFilter}>
-                <Sliders size={20} color="#3E3A40" weight="bold" />
-              </TouchableOpacity>
-            </Center>
-          }
+        <Controller
+          control={control}
+          name="searchProduct"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Buscar anúncio"
+              InputRightElement={
+                <Center flexDirection="row" mr={4}>
+                  <TouchableOpacity onPress={handleSubmit(handleProductSearch)}>
+                    <MagnifyingGlass size={20} color="#3E3A40" weight="bold" />
+                  </TouchableOpacity>
+                  <Box w="1px" bg="gray.400" h="5" mx={3} />
+                  <TouchableOpacity onPress={onOpenFilter}>
+                    <Sliders size={20} color="#3E3A40" weight="bold" />
+                  </TouchableOpacity>
+                </Center>
+              }
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
         />
       </VStack>
     </Box>
@@ -199,13 +335,18 @@ export default function Home() {
           ListHeaderComponent={ListHeader}
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll
-          ListEmptyComponent={() => (
-            <Text color="gray.500">Nenhum anúncio encontrado :(</Text>
-          )}
+          ListEmptyComponent={() => EmptyList()}
         />
       )}
 
-      <Filter modalizeRef={modalizeRef} />
+      <Filter
+        modalizeRef={modalizeRef}
+        control={control}
+        handleSubmit={handleSubmit}
+        getValues={getValues}
+        handleProductFilter={handleProductFilter}
+        handleFilterReset={handleFilterReset}
+      />
     </SafeAreaView>
   );
 }
