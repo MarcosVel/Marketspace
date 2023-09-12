@@ -23,6 +23,9 @@ type ItemProps = {
     price: number;
     accept_trade: boolean;
     payment_methods: string[];
+    user: {
+      avatar: string;
+    };
     is_active: boolean;
     user_id: string;
   };
@@ -85,7 +88,7 @@ export default function Item({ data, homeItem }: ItemProps) {
           position="absolute"
           top={1}
           left={1}
-          avatarUrl={user.avatar}
+          avatarUrl={homeItem ? data.user.avatar : user.avatar}
         />
 
         <Box
