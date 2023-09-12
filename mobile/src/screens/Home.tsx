@@ -17,6 +17,7 @@ import {
   Tag,
 } from "phosphor-react-native";
 import { useCallback, useContext, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Button from "../components/Button";
@@ -30,6 +31,10 @@ import { AppNavigationProps } from "../routes/app.routes";
 import api from "../services/api";
 import { AppError } from "../utils/AppError";
 
+type SearchProductProps = {
+  searchProduct: string;
+};
+
 export default function Home() {
   const toast = useToast();
   const { user } = useContext(AuthContext);
@@ -38,6 +43,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [myAdsLength, setMyAdsLength] = useState(0);
+  const { control, handleSubmit, reset } = useForm<SearchProductProps>();
+  const [isUsingFilter, setIsUsingFilter] = useState(false);
 
   const onOpenFilter = () => {
     modalizeRef.current?.open();
@@ -86,11 +93,52 @@ export default function Home() {
     }
   }
 
+  async function handleProductSearch({ searchProduct }: SearchProductProps) {
+    try {
+      if (!searchProduct) return;
+
+      setIsUsingFilter(true);
+
+      const { data } = await api.get(`/products?query=${searchProduct}`);
+
+      setProducts(data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar o histórico";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       fetchProducts();
       fetchMyAdsLength();
     }, [])
+  );
+
+  const EmptyList = () => (
+    <Center>
+      <Text color="gray.500">Nenhum anúncio encontrado :(</Text>
+      {isUsingFilter && (
+        <Button
+          mt={4}
+          title="Resetar filtros"
+          variant="dark"
+          w={null}
+          onPress={() => {
+            fetchProducts();
+            setIsUsingFilter(false);
+            reset({ searchProduct: "" });
+          }}
+        />
+      )}
+    </Center>
   );
 
   const ListHeader = () => (
@@ -184,19 +232,27 @@ export default function Home() {
           Compre produtos variados
         </Text>
 
-        <Input
-          placeholder="Buscar anúncio"
-          InputRightElement={
-            <Center flexDirection="row" mr={4}>
-              <TouchableOpacity>
-                <MagnifyingGlass size={20} color="#3E3A40" weight="bold" />
-              </TouchableOpacity>
-              <Box w="1px" bg="gray.400" h="5" mx={3} />
-              <TouchableOpacity onPress={onOpenFilter}>
-                <Sliders size={20} color="#3E3A40" weight="bold" />
-              </TouchableOpacity>
-            </Center>
-          }
+        <Controller
+          control={control}
+          name="searchProduct"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Buscar anúncio"
+              InputRightElement={
+                <Center flexDirection="row" mr={4}>
+                  <TouchableOpacity onPress={handleSubmit(handleProductSearch)}>
+                    <MagnifyingGlass size={20} color="#3E3A40" weight="bold" />
+                  </TouchableOpacity>
+                  <Box w="1px" bg="gray.400" h="5" mx={3} />
+                  <TouchableOpacity onPress={onOpenFilter}>
+                    <Sliders size={20} color="#3E3A40" weight="bold" />
+                  </TouchableOpacity>
+                </Center>
+              }
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
         />
       </VStack>
     </Box>
@@ -223,9 +279,7 @@ export default function Home() {
           ListHeaderComponent={ListHeader}
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll
-          ListEmptyComponent={() => (
-            <Text color="gray.500">Nenhum anúncio encontrado :(</Text>
-          )}
+          ListEmptyComponent={() => EmptyList()}
         />
       )}
 
