@@ -1,4 +1,4 @@
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import {
   Box,
   Center,
@@ -16,7 +16,7 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, TouchableOpacity } from "react-native";
 import { Modalize } from "react-native-modalize";
@@ -33,6 +33,9 @@ import { AppError } from "../utils/AppError";
 
 type SearchProductProps = {
   searchProduct: string;
+  is_new: boolean;
+  accept_trade: boolean;
+  payment_methods: string[];
 };
 
 export default function Home() {
@@ -43,7 +46,15 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [myAdsLength, setMyAdsLength] = useState(0);
-  const { control, handleSubmit, reset } = useForm<SearchProductProps>();
+  const { control, handleSubmit, getValues, reset } =
+    useForm<SearchProductProps>({
+      defaultValues: {
+        searchProduct: "",
+        is_new: true,
+        accept_trade: false,
+        payment_methods: ["pix", "card", "boleto", "cash", "deposit"],
+      },
+    });
   const [isUsingFilter, setIsUsingFilter] = useState(false);
 
   const onOpenFilter = () => {
@@ -112,15 +123,60 @@ export default function Home() {
         title,
         bgColor: "red.400",
       });
+
+      setIsUsingFilter(false);
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchProducts();
-      fetchMyAdsLength();
-    }, [])
-  );
+  async function handleProductFilter({
+    is_new,
+    accept_trade,
+    payment_methods,
+  }: SearchProductProps) {
+    try {
+      setIsUsingFilter(true);
+
+      const { data } = await api.get("/products", {
+        params: {
+          is_new,
+          accept_trade,
+          payment_methods,
+        },
+      });
+
+      setProducts(data);
+
+      modalizeRef.current?.close();
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar o histórico";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
+
+      setIsUsingFilter(false);
+    }
+  }
+
+  function handleFilterReset() {
+    reset({
+      is_new: true,
+      accept_trade: false,
+      payment_methods: ["pix", "card", "boleto", "cash", "deposit"],
+    });
+    setIsUsingFilter(false);
+    fetchProducts();
+    modalizeRef.current?.close();
+  }
+
+  useEffect(() => {
+    fetchProducts();
+    fetchMyAdsLength();
+  }, []);
 
   const EmptyList = () => (
     <Center>
@@ -132,9 +188,9 @@ export default function Home() {
           variant="dark"
           w={null}
           onPress={() => {
-            fetchProducts();
             setIsUsingFilter(false);
             reset({ searchProduct: "" });
+            fetchProducts();
           }}
         />
       )}
@@ -283,7 +339,14 @@ export default function Home() {
         />
       )}
 
-      <Filter modalizeRef={modalizeRef} />
+      <Filter
+        modalizeRef={modalizeRef}
+        control={control}
+        handleSubmit={handleSubmit}
+        getValues={getValues}
+        handleProductFilter={handleProductFilter}
+        handleFilterReset={handleFilterReset}
+      />
     </SafeAreaView>
   );
 }
