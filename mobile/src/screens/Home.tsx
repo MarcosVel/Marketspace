@@ -43,9 +43,6 @@ export default function Home() {
   const { user } = useContext(AuthContext);
   const navigation = useNavigation<AppNavigationProps>();
   const modalizeRef = useRef<Modalize>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [myAdsLength, setMyAdsLength] = useState(0);
   const { control, handleSubmit, getValues, reset } =
     useForm<SearchProductProps>({
       defaultValues: {
@@ -55,7 +52,11 @@ export default function Home() {
         payment_methods: ["pix", "card", "boleto", "cash", "deposit"],
       },
     });
+  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [myAdsLength, setMyAdsLength] = useState(0);
   const [isUsingFilter, setIsUsingFilter] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const onOpenFilter = () => {
     modalizeRef.current?.open();
@@ -171,6 +172,25 @@ export default function Home() {
     setIsUsingFilter(false);
     fetchProducts();
     modalizeRef.current?.close();
+  }
+
+  function handleRefresh() {
+    try {
+      setIsRefreshing(true);
+      fetchProducts();
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível recarregar os produtos";
+
+      toast.show({
+        title,
+        bgColor: "red.400",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
   }
 
   useEffect(() => {
@@ -336,6 +356,8 @@ export default function Home() {
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll
           ListEmptyComponent={() => EmptyList()}
+          onRefresh={handleRefresh}
+          refreshing={isRefreshing}
         />
       )}
 
