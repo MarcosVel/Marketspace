@@ -30,6 +30,7 @@ import { useCallback, useLayoutEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
+  Linking,
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
@@ -414,7 +415,11 @@ export default function Details() {
                 leftIcon={
                   <WhatsappLogo size={16} color="#EDECEE" weight="fill" />
                 }
-                onPress={() => {}} /** @todo send to wpp number */
+                onPress={() =>
+                  Linking.openURL(
+                    `https://wa.me/55${product.user.tel}?text=Tenho%20interesse%20no%20seu%20produto:%20${product.name}`
+                  )
+                }
               />
             </Box>
           )}
