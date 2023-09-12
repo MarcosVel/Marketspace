@@ -10,9 +10,7 @@ import api from "../services/api";
 
 export default function MyAds() {
   const navigation = useNavigation<AppNavigationProps>();
-  const [filter, setFilter] = useState<"all" | "actives" | "inactives">(
-    "all"
-  ); /** @todo implement filter */
+  const [filter, setFilter] = useState<"all" | "actives" | "inactives">("all");
   const [isLoading, setIsLoading] = useState(false);
   const [myAds, setMyAds] = useState([]);
   const [allMyAds, setAllMyAds] = useState([]);
