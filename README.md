@@ -20,7 +20,7 @@ Ignite Marketspace is a marketplace application developed as part of RocketSeat'
 - **Styled-components**: For styling the application components.
 - **Axios**: For making API requests.
 - **React Navigation**: For navigation within the app.
-- **Formik**: For handling form state and validation.
+- **Hook-form**: For handling form state and validation.
 - **Yup**: For schema validation.
 - **Expo**: To streamline the development process.
 
